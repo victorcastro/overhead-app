@@ -18,8 +18,6 @@ struct SinkingFoundApp: App {
         WindowGroup {
             RootTabView()
                 .environment(settings)
-                // Rebuilding the tree reattaches every @Query to the new container's context.
-                .id(settings.iCloudSyncEnabled)
                 .onChange(of: settings.iCloudSyncEnabled) { _, enabled in
                     container = ExpenseStore.makeContainer(cloudSyncEnabled: enabled)
                 }

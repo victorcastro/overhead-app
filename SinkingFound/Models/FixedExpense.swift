@@ -3,7 +3,6 @@ import SwiftData
 
 @Model
 final class FixedExpense {
-    // CloudKit requires every stored property to be optional or have a default value.
     var name: String = ""
     var amount: Decimal = 0
     var currency: Currency = Currency.usd

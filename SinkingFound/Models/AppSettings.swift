@@ -17,8 +17,6 @@ final class AppSettings {
         }
     }
 
-    /// Never mirrored to iCloud: turning sync off on one device must not turn it off
-    /// everywhere, which would leave no way to turn it back on.
     var iCloudSyncEnabled: Bool {
         didSet {
             defaults.set(iCloudSyncEnabled, forKey: Self.iCloudSyncEnabledKey)
@@ -74,7 +72,6 @@ final class AppSettings {
         ubiquitous.synchronize()
     }
 
-    /// Removes the mirrored settings from iCloud. The local copies are left untouched.
     func clearCloudMirror() {
         ubiquitous.removeObject(forKey: Self.baseCurrencyKey)
         ubiquitous.removeObject(forKey: Self.locationCodesKey)

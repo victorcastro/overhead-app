@@ -1,7 +1,5 @@
 import Foundation
 
-/// The slice of `NSUbiquitousKeyValueStore` that `AppSettings` needs, so the mirroring can
-/// be exercised in tests without an iCloud account.
 protocol KeyValueStore: AnyObject {
     func string(forKey key: String) -> String?
     func array(forKey key: String) -> [Any]?
