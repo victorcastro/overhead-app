@@ -3,32 +3,27 @@ import SwiftData
 
 @main
 struct SinkingFoundApp: App {
-    @State private var settings = AppSettings()
+    @State private var settings: AppSettings
+    @State private var container: ModelContainer
 
-    let sharedModelContainer: ModelContainer = {
-        let schema = Schema([FixedExpense.self])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            let path = modelConfiguration.url.path
-            for suffix in ["", "-wal", "-shm"] {
-                try? FileManager.default.removeItem(atPath: path + suffix)
-            }
-            do {
-                return try ModelContainer(for: schema, configurations: [modelConfiguration])
-            } catch {
-                fatalError("Could not create ModelContainer: \(error)")
-            }
-        }
-    }()
+    init() {
+        let settings = AppSettings()
+        _settings = State(initialValue: settings)
+        _container = State(
+            initialValue: ExpenseStore.makeContainer(cloudSyncEnabled: settings.iCloudSyncEnabled)
+        )
+    }
 
     var body: some Scene {
         WindowGroup {
             RootTabView()
                 .environment(settings)
+                // Rebuilding the tree reattaches every @Query to the new container's context.
+                .id(settings.iCloudSyncEnabled)
+                .onChange(of: settings.iCloudSyncEnabled) { _, enabled in
+                    container = ExpenseStore.makeContainer(cloudSyncEnabled: enabled)
+                }
         }
-        .modelContainer(sharedModelContainer)
+        .modelContainer(container)
     }
 }

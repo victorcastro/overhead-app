@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Tab bar navigation with three top-level screens: Home (the current month), Calendar (the annual totals), and Settings.
+- Optional iCloud sync, off by default and toggled from Settings. It covers the expenses, the base currency, and the
+  locations, and applies without restarting the app. Turning it off keeps both the data on the device and the copy in
+  iCloud, so turning it back on merges them again.
+- Settings action to delete this app's data from the user's private iCloud database. It turns syncing off first, leaves
+  the data on the device untouched, and asks for confirmation because it cannot be undone.
 - Settings screen to choose the base currency (USD default, plus EUR, PEN, GBP); every total is shown in that currency and
   each expense is converted from the currency it was entered in. The choice is persisted locally.
 - User-managed locations in Settings: search a country catalog and pick which countries to track. Expenses default to

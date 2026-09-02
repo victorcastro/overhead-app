@@ -150,14 +150,18 @@ SinkingFound/
 │   │   └── RootTabView.swift        # Home, Calendar, and Settings tabs
 │   └── Settings/
 │       ├── LocationSettingsView.swift
-│       └── SettingsView.swift       # Base currency, locations, exchange rates
+│       └── SettingsView.swift       # iCloud, base currency, locations, exchange rates
 ├── Models/
-│   ├── AppSettings.swift            # Base currency and locations, persisted locally
+│   ├── AppSettings.swift            # Base currency, locations, and the iCloud sync flag
+│   ├── CloudDataEraser.swift        # Deletes this app's data from the private iCloud database
 │   ├── Currency.swift               # Currency metadata and money formatting
 │   ├── ExpenseAttributes.swift      # Frequency, category, and location types
+│   ├── ExpenseStore.swift           # Builds the model container, with or without CloudKit
 │   ├── FixedExpense.swift           # SwiftData persistence model
+│   ├── KeyValueStore.swift          # Testable seam over NSUbiquitousKeyValueStore
 │   ├── Location.swift               # Country catalog
 │   └── MonthPlan.swift              # Monthly planning calculations
+├── SinkingFound.entitlements        # iCloud container, CloudKit, and key-value store
 └── SinkingFoundApp.swift            # App entry point and model container
 ```
 
@@ -167,8 +171,17 @@ SwiftUI views inside feature folders. This separation makes the financial rules 
 ## Data and privacy
 
 - Expense data is persisted locally using SwiftData.
-- There is currently no analytics, account system, cloud synchronization, or remote backend.
+- iCloud sync is off by default and only runs when it is turned on in Settings. When enabled, the expenses go to the
+  user's private CloudKit database and the base currency and locations go to `NSUbiquitousKeyValueStore`; nothing leaves
+  the user's own iCloud account. Turning it off stops syncing without deleting anything on either side.
+- Settings has a separate, explicit action to delete this app's data from iCloud. It never runs as a side effect of
+  turning sync off.
+- There is currently no analytics, account system, or remote backend beyond the user's own iCloud.
 - Deleting the app may also remove its local data unless it is restored through an operating-system backup.
+
+Enabling iCloud sync requires the *iCloud → CloudKit* and *Background Modes → Remote notifications* capabilities on the
+`SinkingFound` target, with the container `iCloud.dev.victorcastro.SinkingFound`. The schema is created in CloudKit's
+Development environment on first run and must be deployed to Production before an App Store release.
 
 > [!IMPORTANT]
 > Currency conversion currently uses static reference rates defined in `Currency.swift`. These values are not fetched

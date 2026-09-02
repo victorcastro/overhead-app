@@ -3,16 +3,17 @@ import SwiftData
 
 @Model
 final class FixedExpense {
-    var name: String
-    var amount: Decimal
-    var currency: Currency
-    var frequency: ExpenseFrequency
-    var category: ExpenseCategory
+    // CloudKit requires every stored property to be optional or have a default value.
+    var name: String = ""
+    var amount: Decimal = 0
+    var currency: Currency = Currency.usd
+    var frequency: ExpenseFrequency = ExpenseFrequency.monthly
+    var category: ExpenseCategory = ExpenseCategory.utilities
     var location: String = ""
-    var anchorDueDate: Date
-    var intervalMonths: Int
-    var paidPeriods: [String]
-    var createdAt: Date
+    var anchorDueDate: Date = Date.now
+    var intervalMonths: Int = 1
+    var paidPeriods: [String] = []
+    var createdAt: Date = Date.now
 
     init(
         name: String,
