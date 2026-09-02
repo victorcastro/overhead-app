@@ -9,7 +9,7 @@ struct MonthSummaryCard: View {
                 .font(.system(size: 12))
                 .foregroundStyle(Theme.secondaryText)
 
-            Text(Money.string(plan.stillToSetAside))
+            Text(Money.string(plan.stillToSetAside, currency: plan.base))
                 .font(.system(size: 44, weight: .bold))
                 .kerning(-1)
                 .foregroundStyle(Theme.primaryText)
@@ -21,16 +21,16 @@ struct MonthSummaryCard: View {
                 .padding(.bottom, 8)
 
             HStack {
-                Text("\(Money.string(plan.paidTotal)) paid")
+                Text("\(Money.string(plan.paidTotal, currency: plan.base)) paid")
                 Spacer(minLength: 8)
-                Text("of \(Money.string(plan.total)) total")
+                Text("of \(Money.string(plan.total, currency: plan.base)) total")
             }
             .font(.system(size: 12))
             .foregroundStyle(Theme.secondaryText)
 
             Text(
-                "\(Money.string(plan.unpaidThisMonth)) unpaid this month + "
-                    + "\(Money.string(plan.annualShare)) share of annual"
+                "\(Money.string(plan.unpaidThisMonth, currency: plan.base)) unpaid this month + "
+                    + "\(Money.string(plan.annualShare, currency: plan.base)) share of annual"
             )
                 .font(.system(size: 12))
                 .foregroundStyle(Theme.secondaryText)
@@ -45,8 +45,9 @@ struct MonthSummaryCard: View {
     }
 
     private var accessibilitySummary: String {
-        "Still to set aside in \(monthName): \(Money.string(plan.stillToSetAside)). "
-            + "\(Money.string(plan.paidTotal)) paid of \(Money.string(plan.total))."
+        "Still to set aside in \(monthName): \(Money.string(plan.stillToSetAside, currency: plan.base)). "
+            + "\(Money.string(plan.paidTotal, currency: plan.base)) paid "
+            + "of \(Money.string(plan.total, currency: plan.base))."
     }
 }
 
@@ -136,8 +137,8 @@ struct ExpenseRow: View {
                 Text(Money.string(expense.amount, currency: expense.currency))
                     .font(.system(size: 15, weight: .medium))
                     .foregroundStyle(occurrence.isPaid ? Theme.mutedText : Theme.primaryText)
-                if expense.currency != .eur {
-                    Text("≈ \(Money.string(expense.amountInEUR))")
+                if expense.currency != occurrence.base {
+                    Text("≈ \(Money.string(occurrence.amountInBase, currency: occurrence.base))")
                         .font(.system(size: 12))
                         .foregroundStyle(Theme.secondaryText)
                 }
@@ -222,10 +223,10 @@ struct AnnualShareRow: View {
             .frame(maxWidth: .infinity, alignment: .leading)
 
             VStack(alignment: .trailing, spacing: 2) {
-                Text("\(Money.string(item.monthlyShareEUR)) / mo")
+                Text("\(Money.string(item.monthlyShareInBase, currency: item.base)) / mo")
                     .font(.system(size: 15, weight: .medium))
                     .foregroundStyle(Theme.primaryText)
-                Text("of \(Money.string(expense.amountInEUR))")
+                Text("of \(Money.string(expense.amount(in: item.base), currency: item.base))")
                     .font(.system(size: 12))
                     .foregroundStyle(Theme.secondaryText)
             }
@@ -238,12 +239,13 @@ struct AnnualShareRow: View {
 
 struct PaidSummaryCard: View {
     let paid: [ExpenseOccurrence]
+    let base: Currency
     let showsLocation: Bool
     @Binding var isExpanded: Bool
     let onTogglePaid: (ExpenseOccurrence) -> Void
     let onSelect: (ExpenseOccurrence) -> Void
 
-    private var total: Decimal { paid.reduce(0) { $0 + $1.amountInEUR } }
+    private var total: Decimal { paid.reduce(0) { $0 + $1.amountInBase } }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -262,7 +264,7 @@ struct PaidSummaryCard: View {
                             .lineLimit(1)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    Text(Money.string(total))
+                    Text(Money.string(total, currency: base))
                         .font(.system(size: 15, weight: .medium))
                         .foregroundStyle(Theme.mutedText)
                     Image(systemName: "chevron.right")

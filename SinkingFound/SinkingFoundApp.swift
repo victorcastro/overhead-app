@@ -3,6 +3,8 @@ import SwiftData
 
 @main
 struct SinkingFoundApp: App {
+    @State private var settings = AppSettings()
+
     let sharedModelContainer: ModelContainer = {
         let schema = Schema([FixedExpense.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
@@ -17,6 +19,7 @@ struct SinkingFoundApp: App {
     var body: some Scene {
         WindowGroup {
             DashboardView()
+                .environment(settings)
         }
         .modelContainer(sharedModelContainer)
     }

@@ -5,14 +5,16 @@ struct AnnualCalendarView: View {
     @Binding var selection: Date
 
     let expenses: [FixedExpense]
+    let base: Currency
 
     @State private var displayedYear: Date
 
     private let calendar = Calendar.current
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
 
-    init(expenses: [FixedExpense], selection: Binding<Date>) {
+    init(expenses: [FixedExpense], base: Currency, selection: Binding<Date>) {
         self.expenses = expenses
+        self.base = base
         _selection = selection
         let year = Calendar.current.dateInterval(of: .year, for: selection.wrappedValue)?.start
         _displayedYear = State(initialValue: year ?? selection.wrappedValue)
@@ -23,7 +25,7 @@ struct AnnualCalendarView: View {
             guard let date = calendar.date(byAdding: .month, value: offset, to: displayedYear) else {
                 return nil
             }
-            let total = MonthPlan(expenses: expenses, month: date).dueThisMonth
+            let total = MonthPlan(expenses: expenses, month: date, base: base).dueThisMonth
             return AnnualMonthSummary(date: date, total: total)
         }
     }
@@ -55,7 +57,7 @@ struct AnnualCalendarView: View {
                         Text("Total fixed cost this year")
                             .font(.caption)
                             .foregroundStyle(Theme.secondaryText)
-                        Text(Money.string(annualTotal))
+                        Text(Money.string(annualTotal, currency: base))
                             .font(.system(size: 34, weight: .bold))
                             .foregroundStyle(Theme.primaryText)
                     }
@@ -133,7 +135,7 @@ struct AnnualCalendarView: View {
 
                 Spacer()
 
-                Text(Money.string(month.total))
+                Text(Money.string(month.total, currency: base))
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(color)
                     .lineLimit(1)
@@ -205,7 +207,7 @@ struct AnnualCalendarView: View {
     private func monthAccessibilityLabel(_ month: AnnualMonthSummary, isCurrent: Bool) -> String {
         let date = month.date.formatted(.dateTime.month(.wide).year())
         let current = isCurrent ? ", current month" : ""
-        return "\(date), \(Money.string(month.total)) in fixed expenses\(current)"
+        return "\(date), \(Money.string(month.total, currency: base)) in fixed expenses\(current)"
     }
 }
 

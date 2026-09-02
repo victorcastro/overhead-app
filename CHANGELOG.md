@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Settings screen to choose the base currency (USD default, plus EUR, PEN, GBP); every total is shown in that currency and
+  each expense is converted from the currency it was entered in. The choice is persisted locally.
 - Resource-conscious GitHub Actions workflow for version checks, changelog validation, linting, simulator builds, and
   unit tests, followed by automatic version tagging on `main`.
 

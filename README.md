@@ -15,8 +15,7 @@
 
   ![Platform](https://img.shields.io/badge/platform-iOS%2018%2B-000000?style=flat-square&logo=apple)
   ![Swift](https://img.shields.io/badge/Swift-5.0-F05138?style=flat-square&logo=swift&logoColor=white)
-  ![UI](https://img.shields.io/badge/UI-SwiftUI-0D96F6?style=flat-square)
-  ![Storage](https://img.shields.io/badge/storage-SwiftData-7C4DFF?style=flat-square)
+  [![Main CI Pipeline](https://github.com/victorcastro/sinking-found/actions/workflows/main-pipeline.yml/badge.svg)](https://github.com/victorcastro/sinking-found/actions/workflows/main-pipeline.yml)
   ![License](https://img.shields.io/badge/license-MIT-34C759?style=flat-square)
 </div>
 

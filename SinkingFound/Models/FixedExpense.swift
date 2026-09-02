@@ -17,7 +17,7 @@ final class FixedExpense {
     init(
         name: String,
         amount: Decimal,
-        currency: Currency = .eur,
+        currency: Currency = .usd,
         frequency: ExpenseFrequency = .monthly,
         category: ExpenseCategory = .utilities,
         location: ExpenseLocation = .spain,
@@ -38,7 +38,7 @@ final class FixedExpense {
         self.createdAt = createdAt
     }
 
-    var amountInEUR: Decimal { amount / currency.unitsPerEUR }
+    func amount(in base: Currency) -> Decimal { currency.amount(amount, to: base) }
 
     func dueDate(in month: Date, calendar: Calendar = .current) -> Date? {
         guard let monthStart = calendar.dateInterval(of: .month, for: month)?.start,

@@ -15,6 +15,7 @@ enum ExpenseEditorTarget: Identifiable {
 
 struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(AppSettings.self) private var settings
     @Query(sort: \FixedExpense.anchorDueDate) private var expenses: [FixedExpense]
 
     @State private var filter: LocationFilter = .all
@@ -22,13 +23,14 @@ struct DashboardView: View {
     @State private var editorTarget: ExpenseEditorTarget?
     @State private var selectedMonth = Calendar.current.dateInterval(of: .month, for: .now)?.start ?? .now
     @State private var isAnnualCalendarPresented = false
+    @State private var isSettingsPresented = false
 
     private var visibleExpenses: [FixedExpense] {
         expenses.filter(filter.matches)
     }
 
     private var plan: MonthPlan {
-        MonthPlan(expenses: visibleExpenses, month: selectedMonth)
+        MonthPlan(expenses: visibleExpenses, month: selectedMonth, base: settings.baseCurrency)
     }
 
     private var monthTitle: String {
@@ -65,6 +67,7 @@ struct DashboardView: View {
                     if !plan.paid.isEmpty {
                         PaidSummaryCard(
                             paid: plan.paid,
+                            base: plan.base,
                             showsLocation: filter == .all,
                             isExpanded: $isPaidExpanded,
                             onTogglePaid: togglePaid,
@@ -94,6 +97,14 @@ struct DashboardView: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle(monthAndYearTitle)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        isSettingsPresented = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                    .accessibilityLabel("Settings")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack(spacing: 16) {
                         Button {
@@ -121,9 +132,16 @@ struct DashboardView: View {
                 }
             }
             .sheet(isPresented: $isAnnualCalendarPresented) {
-                AnnualCalendarView(expenses: visibleExpenses, selection: $selectedMonth)
-                    .presentationDetents([.large])
-                    .presentationDragIndicator(.visible)
+                AnnualCalendarView(
+                    expenses: visibleExpenses,
+                    base: settings.baseCurrency,
+                    selection: $selectedMonth
+                )
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+            }
+            .sheet(isPresented: $isSettingsPresented) {
+                SettingsView()
             }
             .onChange(of: selectedMonth) {
                 isPaidExpanded = false

@@ -4,6 +4,7 @@ import SwiftData
 struct ExpenseFormView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppSettings.self) private var settings
     @Query private var allExpenses: [FixedExpense]
 
     private let expense: FixedExpense?
@@ -25,7 +26,7 @@ struct ExpenseFormView: View {
         self.month = month
         _name = State(initialValue: expense?.name ?? "")
         _amountText = State(initialValue: expense.map { Self.editableAmount($0.amount) } ?? "")
-        _currency = State(initialValue: expense?.currency ?? .eur)
+        _currency = State(initialValue: expense?.currency ?? .usd)
         _frequency = State(initialValue: expense?.frequency ?? .monthly)
         _intervalMonths = State(initialValue: expense?.intervalMonths ?? 3)
         _category = State(initialValue: expense?.category ?? .utilities)
@@ -157,18 +158,19 @@ struct ExpenseFormView: View {
         }
 
         let others = allExpenses.filter { $0 !== expense }
-        let currentTotal = MonthPlan(expenses: allExpenses, month: month).total
-        let baseTotal = MonthPlan(expenses: others, month: month).total
+        let currentTotal = MonthPlan(expenses: allExpenses, month: month, base: settings.baseCurrency).total
+        let baseTotal = MonthPlan(expenses: others, month: month, base: settings.baseCurrency).total
         let newTotal = baseTotal + draftContribution(amount: amount)
         let delta = newTotal - currentTotal
 
-        let newTotalText = Money.string(newTotal)
+        let newTotalText = Money.string(newTotal, currency: settings.baseCurrency)
         if delta == 0 {
             return "\(monthName) total stays at \(newTotalText)."
         }
         let verb = delta > 0 ? "Adds" : "Removes"
         let direction = delta > 0 ? "to" : "from"
-        return "\(verb) \(Money.string(abs(delta))) \(direction) \(monthName) — new total \(newTotalText)."
+        return "\(verb) \(Money.string(abs(delta), currency: settings.baseCurrency)) "
+            + "\(direction) \(monthName) — new total \(newTotalText)."
     }
 
     private func draftContribution(amount: Decimal) -> Decimal {
@@ -183,9 +185,9 @@ struct ExpenseFormView: View {
             intervalMonths: intervalMonths
         )
         if draft.dueDate(in: month) != nil {
-            return draft.amountInEUR
+            return draft.amount(in: settings.baseCurrency)
         }
-        return frequency == .annual ? draft.amountInEUR / 12 : 0
+        return frequency == .annual ? draft.amount(in: settings.baseCurrency) / 12 : 0
     }
 
     private func save() {
