@@ -1,19 +1,10 @@
-//
-//  SinkingFoundApp.swift
-//  SinkingFound
-//
-//  Created by Victor Castro on 2/09/26.
-//
-
 import SwiftUI
 import SwiftData
 
 @main
 struct SinkingFoundApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
+    let sharedModelContainer: ModelContainer = {
+        let schema = Schema([FixedExpense.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {
@@ -25,7 +16,7 @@ struct SinkingFoundApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            DashboardView()
         }
         .modelContainer(sharedModelContainer)
     }

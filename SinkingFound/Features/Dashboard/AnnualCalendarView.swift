@@ -1,0 +1,217 @@
+import SwiftUI
+
+struct AnnualCalendarView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Binding var selection: Date
+
+    let expenses: [FixedExpense]
+
+    @State private var displayedYear: Date
+
+    private let calendar = Calendar.current
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
+
+    init(expenses: [FixedExpense], selection: Binding<Date>) {
+        self.expenses = expenses
+        _selection = selection
+        let year = Calendar.current.dateInterval(of: .year, for: selection.wrappedValue)?.start
+        _displayedYear = State(initialValue: year ?? selection.wrappedValue)
+    }
+
+    private var months: [AnnualMonthSummary] {
+        (0..<12).compactMap { offset in
+            guard let date = calendar.date(byAdding: .month, value: offset, to: displayedYear) else {
+                return nil
+            }
+            let total = MonthPlan(expenses: expenses, month: date).dueThisMonth
+            return AnnualMonthSummary(date: date, total: total)
+        }
+    }
+
+    private var annualTotal: Decimal {
+        months.reduce(0) { $0 + $1.total }
+    }
+
+    private var average: Double {
+        guard !months.isEmpty else { return 0 }
+        return (annualTotal as NSDecimalNumber).doubleValue / Double(months.count)
+    }
+
+    private var largestMonth: Double {
+        months.map { ($0.total as NSDecimalNumber).doubleValue }.max() ?? 0
+    }
+
+    private var yearTitle: String {
+        displayedYear.formatted(.dateTime.year())
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    yearHeader
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Total fixed cost this year")
+                            .font(.caption)
+                            .foregroundStyle(Theme.secondaryText)
+                        Text(Money.string(annualTotal))
+                            .font(.system(size: 34, weight: .bold))
+                            .foregroundStyle(Theme.primaryText)
+                    }
+
+                    LazyVGrid(columns: columns, spacing: 10) {
+                        ForEach(months) { month in
+                            monthButton(month)
+                        }
+                    }
+
+                    calendarLegend
+                }
+                .padding(.horizontal, Theme.horizontalPadding)
+                .padding(.vertical, 12)
+            }
+            .background(Theme.background)
+            .scrollIndicators(.hidden)
+            .navigationTitle("Annual calendar")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+        }
+        .preferredColorScheme(.dark)
+    }
+
+    private var yearHeader: some View {
+        HStack {
+            Button {
+                moveYear(by: -1)
+            } label: {
+                Image(systemName: "chevron.left")
+                    .frame(width: 32, height: 32)
+            }
+            .accessibilityLabel("Previous year")
+
+            Text(yearTitle)
+                .font(.title2.bold())
+                .frame(maxWidth: .infinity)
+
+            Button {
+                moveYear(by: 1)
+            } label: {
+                Image(systemName: "chevron.right")
+                    .frame(width: 32, height: 32)
+            }
+            .accessibilityLabel("Next year")
+        }
+    }
+
+    private func monthButton(_ month: AnnualMonthSummary) -> some View {
+        let isCurrent = calendar.isDate(month.date, equalTo: .now, toGranularity: .month)
+        let isSelected = calendar.isDate(month.date, equalTo: selection, toGranularity: .month)
+        let color = statusColor(for: month.total)
+
+        return Button {
+            selection = month.date
+            dismiss()
+        } label: {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(spacing: 6) {
+                    Text(month.date.formatted(.dateTime.month(.abbreviated)).uppercased())
+                        .font(.caption.weight(.semibold))
+                    Spacer(minLength: 0)
+                    if isCurrent {
+                        Circle()
+                            .fill(Theme.positive)
+                            .frame(width: 7, height: 7)
+                            .accessibilityHidden(true)
+                    }
+                }
+                .foregroundStyle(isCurrent ? Theme.positive : Theme.primaryText)
+
+                Spacer()
+
+                Text(Money.string(month.total))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(color)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+
+                GeometryReader { proxy in
+                    ZStack(alignment: .leading) {
+                        Capsule().fill(Theme.control.opacity(0.45))
+                        Capsule()
+                            .fill(color)
+                            .frame(width: barWidth(total: month.total, available: proxy.size.width))
+                    }
+                }
+                .frame(height: 4)
+                .padding(.top, 14)
+            }
+            .frame(maxWidth: .infinity, minHeight: 82, alignment: .leading)
+            .padding(12)
+            .background(Theme.card, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 13, style: .continuous)
+                    .stroke(isSelected || isCurrent ? Theme.positive : Theme.separator, lineWidth: 1)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(monthAccessibilityLabel(month, isCurrent: isCurrent))
+    }
+
+    private var calendarLegend: some View {
+        HStack(spacing: 14) {
+            legendItem(color: Theme.positive, title: "normal")
+            legendItem(color: .orange, title: "above average")
+            legendItem(color: Theme.destructive, title: "heavy")
+        }
+        .font(.caption2)
+        .foregroundStyle(Theme.secondaryText)
+    }
+
+    private func legendItem(color: Color, title: String) -> some View {
+        HStack(spacing: 5) {
+            RoundedRectangle(cornerRadius: 2)
+                .fill(color)
+                .frame(width: 8, height: 8)
+            Text(title)
+        }
+    }
+
+    private func moveYear(by offset: Int) {
+        guard let year = calendar.date(byAdding: .year, value: offset, to: displayedYear) else { return }
+        withAnimation(.easeInOut(duration: 0.2)) {
+            displayedYear = year
+        }
+    }
+
+    private func statusColor(for total: Decimal) -> Color {
+        let value = (total as NSDecimalNumber).doubleValue
+        guard average > 0 else { return Theme.mutedText }
+        if value > average * 1.5 { return Theme.destructive }
+        if value > average * 1.1 { return .orange }
+        return Theme.positive
+    }
+
+    private func barWidth(total: Decimal, available: CGFloat) -> CGFloat {
+        guard largestMonth > 0 else { return 0 }
+        let ratio = (total as NSDecimalNumber).doubleValue / largestMonth
+        return available * max(0, min(ratio, 1))
+    }
+
+    private func monthAccessibilityLabel(_ month: AnnualMonthSummary, isCurrent: Bool) -> String {
+        let date = month.date.formatted(.dateTime.month(.wide).year())
+        let current = isCurrent ? ", current month" : ""
+        return "\(date), \(Money.string(month.total)) in fixed expenses\(current)"
+    }
+}
+
+private struct AnnualMonthSummary: Identifiable {
+    let date: Date
+    let total: Decimal
+
+    var id: Date { date }
+}

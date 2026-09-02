@@ -1,15 +1,8 @@
-//
-//  SinkingFoundUITestsLaunchTests.swift
-//  SinkingFoundUITests
-//
-//  Created by Victor Castro on 2/09/26.
-//
-
 import XCTest
 
 final class SinkingFoundUITestsLaunchTests: XCTestCase {
 
-    override class var runsForEachTargetApplicationUIConfiguration: Bool {
+    override static var runsForEachTargetApplicationUIConfiguration: Bool {
         true
     }
 
@@ -21,11 +14,6 @@ final class SinkingFoundUITestsLaunchTests: XCTestCase {
     func testLaunch() throws {
         let app = XCUIApplication()
         app.launch()
-
-        // Insert steps here to perform after app launch but before taking a screenshot,
-        // such as logging into a test account or navigating somewhere in the app
-        // XCUIAutomation Documentation
-        // https://developer.apple.com/documentation/xcuiautomation
 
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = "Launch Screen"

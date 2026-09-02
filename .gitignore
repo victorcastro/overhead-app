@@ -1,0 +1,50 @@
+# macOS
+.DS_Store
+
+# Xcode
+DerivedData/
+build/
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Dependency managers
+Pods/
+Carthage/Build/
+
+# SwiftLint
+.swiftlint-cache/
+
+# AI assistants and local agents
+.agents/
+.claude/
+.codex/
+.continue/
+.cursor/
+.gemini/
+.roo/
+.windsurf/
+.aider*
+
+# OpenSpec
+.openspec/
+openspec/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.mobileprovision
+*.p12
+
+# Logs and test artifacts
+*.log
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/

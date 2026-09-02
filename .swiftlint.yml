@@ -1,0 +1,26 @@
+included:
+  - SinkingFound
+  - SinkingFoundTests
+  - SinkingFoundUITests
+
+excluded:
+  - build
+  - DerivedData
+
+reporter: xcode
+
+line_length:
+  warning: 120
+  error: 160
+
+function_body_length:
+  warning: 50
+  error: 100
+
+type_body_length:
+  warning: 300
+  error: 400
+
+file_length:
+  warning: 400
+  error: 500
