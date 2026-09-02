@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Resource-conscious GitHub Actions workflow for version checks, changelog validation, linting, simulator builds, and
+  unit tests.
+
 ## [1.0.0] - 2026-09-02
 
 ### Added
