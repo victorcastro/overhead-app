@@ -114,24 +114,6 @@ Run lint checks separately with:
 swiftlint lint
 ```
 
-## Continuous integration
-
-The [continuous integration workflow](.github/workflows/main-pipeline.yml) validates relevant pushes to `main`
-and pull requests. A lightweight
-Linux job first checks that every Xcode target uses the same semantic `MARKETING_VERSION` and that `CHANGELOG.md` contains
-a dated section for it. The macOS build only starts after this inexpensive check passes.
-
-The macOS job performs SwiftLint validation, builds the app, and runs the unit tests in a single invocation to avoid
-duplicating setup and compilation time.
-
-The workflow cancels superseded runs from the same pull request, ignores documentation-only changes, skips UI performance
-tests, and uploads an `.xcresult` bundle only after a failure. Failure diagnostics expire after seven days to minimize
-artifact storage.
-
-After a successful push or merge to `main`, the pipeline creates an annotated `v<MARKETING_VERSION>` Git tag for the
-validated commit. Existing tags are never overwritten; increment the Xcode marketing version and add its dated changelog
-section before creating the next release tag. Pull requests only run validations and never create tags.
-
 ## Project structure
 
 ```text

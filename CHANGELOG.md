@@ -19,8 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   converted from the currency it was entered in; the choice is persisted locally.
 - User-managed locations in Settings: search a country catalog and pick which countries to track. Deleting one moves its
   expenses back to Undefined, and with none defined the location filter and picker stay hidden.
-- GitHub Actions pipeline that validates the project version against a dated changelog section, lints, builds for the
-  simulator, runs the unit tests, and tags the release on `main`.
+- Two GitHub Actions workflows: pull requests validate the project version against a dated changelog section and then
+  lint, build, and test; merges to `main` do the same and tag the release afterwards.
 
 ### Changed
 
