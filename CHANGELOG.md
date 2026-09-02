@@ -9,30 +9,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Tab bar navigation with three top-level screens: Home (the current month), Calendar (the annual totals), and Settings.
-- Optional iCloud sync, off by default and toggled from Settings. It covers the expenses, the base currency, and the
-  locations, and applies without restarting the app. Turning it off keeps both the data on the device and the copy in
-  iCloud, so turning it back on merges them again.
-- Settings action to delete this app's data from the user's private iCloud database. It turns syncing off first, leaves
-  the data on the device untouched, and asks for confirmation because it cannot be undone.
-- Settings screen to choose the base currency (USD default, plus EUR, PEN, GBP); every total is shown in that currency and
-  each expense is converted from the currency it was entered in. The choice is persisted locally.
-- User-managed locations in Settings: search a country catalog and pick which countries to track. Expenses default to
-  Undefined. With no locations defined, the dashboard location filter and the expense form's location picker stay hidden.
-  Deleting a location moves the expenses that used it back to Undefined. Choices are persisted locally.
-- Resource-conscious GitHub Actions workflow for version checks, changelog validation, linting, simulator builds, and
-  unit tests, followed by automatic version tagging on `main`.
+- Tab bar with three top-level screens: Home (the current month), Calendar (the twelve monthly totals of a year), and
+  Settings. Each tab keeps its own navigation stack and its state across switches.
+- Optional iCloud sync, off by default, toggled in Settings and disabled without an iCloud session. Expenses sync
+  through CloudKit and the base currency and locations through the ubiquitous key-value store, with no app restart.
+- Settings action to delete this app's data from the private iCloud database, behind a confirmation dialog. It turns
+  sync off first, keeps the data on the device, and reports failures in an alert.
+- Base currency picker in Settings (USD default, plus EUR, PEN, GBP). Every total is shown in it and each expense is
+  converted from the currency it was entered in; the choice is persisted locally.
+- User-managed locations in Settings: search a country catalog and pick which countries to track. Deleting one moves its
+  expenses back to Undefined, and with none defined the location filter and picker stay hidden.
+- GitHub Actions pipeline that validates the project version against a dated changelog section, lints, builds for the
+  simulator, runs the unit tests, and tags the release on `main`.
 
 ### Changed
 
-- The annual calendar and the settings screen are now tabs instead of modal sheets, so they no longer open from the
-  dashboard toolbar. The dashboard toolbar keeps only the add-expense button.
-- The annual calendar shows every expense regardless of the dashboard's location filter.
+- The annual calendar and Settings are tabs instead of modal sheets, so their toolbar buttons are gone and the dashboard
+  toolbar keeps only the add-expense button.
+- The annual calendar reads every expense directly instead of receiving the dashboard's, so the location filter no
+  longer narrows the yearly totals.
+- Opening the SwiftData store no longer deletes it when CloudKit is unavailable; it falls back to local storage, and the
+  wipe-and-retry path is now reserved for an unreadable local store.
 
 ### Removed
 
-- Month selection. The dashboard always shows the current month, and tapping a month in the annual calendar no longer
-  changes it.
+- Month selection. The dashboard is pinned to the current month, and tapping a month in the annual calendar only
+  highlights it.
 
 ## [1.0.0] - 2026-09-02
 
