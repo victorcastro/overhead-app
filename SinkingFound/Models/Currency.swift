@@ -4,6 +4,7 @@ enum Currency: String, Codable, CaseIterable, Identifiable {
     case eur = "EUR"
     case pen = "PEN"
     case usd = "USD"
+    case gbp = "GBP"
 
     var id: String { rawValue }
 
@@ -12,6 +13,16 @@ enum Currency: String, Codable, CaseIterable, Identifiable {
         case .eur: "€"
         case .pen: "S/ "
         case .usd: "$"
+        case .gbp: "£"
+        }
+    }
+
+    var displayName: String {
+        switch self {
+        case .eur: "Euro"
+        case .pen: "Peruvian Sol"
+        case .usd: "US Dollar"
+        case .gbp: "British Pound"
         }
     }
 
@@ -20,7 +31,14 @@ enum Currency: String, Codable, CaseIterable, Identifiable {
         case .eur: 1
         case .pen: Decimal(407) / 100
         case .usd: Decimal(108) / 100
+        case .gbp: Decimal(84) / 100
         }
+    }
+
+    func amount(_ value: Decimal, to target: Currency) -> Decimal {
+        guard self != target else { return value }
+        let valueInEUR = value / unitsPerEUR
+        return valueInEUR * target.unitsPerEUR
     }
 }
 
@@ -34,7 +52,7 @@ enum Money {
         return formatter
     }()
 
-    static func string(_ value: Decimal, currency: Currency = .eur, decimals: Int = 0) -> String {
+    static func string(_ value: Decimal, currency: Currency, decimals: Int = 0) -> String {
         formatter.minimumFractionDigits = decimals
         formatter.maximumFractionDigits = decimals
         let digits = formatter.string(from: value as NSDecimalNumber) ?? "0"

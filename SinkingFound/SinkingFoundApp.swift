@@ -3,21 +3,25 @@ import SwiftData
 
 @main
 struct SinkingFoundApp: App {
-    let sharedModelContainer: ModelContainer = {
-        let schema = Schema([FixedExpense.self])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+    @State private var settings: AppSettings
+    @State private var container: ModelContainer
 
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+    init() {
+        let settings = AppSettings()
+        _settings = State(initialValue: settings)
+        _container = State(
+            initialValue: ExpenseStore.makeContainer(cloudSyncEnabled: settings.iCloudSyncEnabled)
+        )
+    }
 
     var body: some Scene {
         WindowGroup {
-            DashboardView()
+            RootTabView()
+                .environment(settings)
+                .onChange(of: settings.iCloudSyncEnabled) { _, enabled in
+                    container = ExpenseStore.makeContainer(cloudSyncEnabled: enabled)
+                }
         }
-        .modelContainer(sharedModelContainer)
+        .modelContainer(container)
     }
 }

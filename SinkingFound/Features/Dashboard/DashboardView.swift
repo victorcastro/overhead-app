@@ -15,28 +15,38 @@ enum ExpenseEditorTarget: Identifiable {
 
 struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(AppSettings.self) private var settings
     @Query(sort: \FixedExpense.anchorDueDate) private var expenses: [FixedExpense]
 
     @State private var filter: LocationFilter = .all
     @State private var isPaidExpanded = false
     @State private var editorTarget: ExpenseEditorTarget?
-    @State private var selectedMonth = Calendar.current.dateInterval(of: .month, for: .now)?.start ?? .now
-    @State private var isAnnualCalendarPresented = false
+
+    private let currentMonth = Calendar.current.dateInterval(of: .month, for: .now)?.start ?? .now
+
+    private var activeFilter: LocationFilter {
+        if case .code(let code) = filter, !settings.locationCodes.contains(code) { return .all }
+        return filter
+    }
 
     private var visibleExpenses: [FixedExpense] {
-        expenses.filter(filter.matches)
+        expenses.filter(activeFilter.matches)
+    }
+
+    private var showsLocation: Bool {
+        settings.hasLocations && activeFilter == .all
     }
 
     private var plan: MonthPlan {
-        MonthPlan(expenses: visibleExpenses, month: selectedMonth)
+        MonthPlan(expenses: visibleExpenses, month: currentMonth, base: settings.baseCurrency)
     }
 
     private var monthTitle: String {
-        selectedMonth.formatted(.dateTime.month(.wide))
+        currentMonth.formatted(.dateTime.month(.wide))
     }
 
     private var monthAndYearTitle: String {
-        selectedMonth.formatted(.dateTime.month(.wide).year())
+        currentMonth.formatted(.dateTime.month(.wide).year())
     }
 
     var body: some View {
@@ -48,13 +58,15 @@ struct DashboardView: View {
                     MonthSummaryCard(plan: plan, monthName: monthTitle)
                         .padding(.bottom, 16)
 
-                    LocationFilterPills(selection: $filter)
-                        .padding(.bottom, 16)
+                    if settings.hasLocations {
+                        LocationFilterPills(codes: settings.locationCodes, selection: $filter)
+                            .padding(.bottom, 16)
+                    }
 
                     if !plan.unpaid.isEmpty {
                         SectionHeader(title: "Unpaid · \(plan.unpaid.count)")
                         CardList(data: plan.unpaid) { occurrence in
-                            ExpenseRow(occurrence: occurrence, showsLocation: filter == .all) {
+                            ExpenseRow(occurrence: occurrence, showsLocation: showsLocation) {
                                 togglePaid(occurrence)
                             }
                             .onTapGesture { editorTarget = .edit(occurrence.expense) }
@@ -65,7 +77,8 @@ struct DashboardView: View {
                     if !plan.paid.isEmpty {
                         PaidSummaryCard(
                             paid: plan.paid,
-                            showsLocation: filter == .all,
+                            base: plan.base,
+                            showsLocation: showsLocation,
                             isExpanded: $isPaidExpanded,
                             onTogglePaid: togglePaid,
                             onSelect: { editorTarget = .edit($0.expense) }
@@ -75,7 +88,7 @@ struct DashboardView: View {
                     if !plan.annualAhead.isEmpty {
                         SectionHeader(title: "Saving ahead · \(plan.annualAhead.count)")
                         CardList(data: plan.annualAhead) { item in
-                            AnnualShareRow(item: item, showsLocation: filter == .all)
+                            AnnualShareRow(item: item, showsLocation: showsLocation)
                                 .onTapGesture { editorTarget = .edit(item.expense) }
                         }
                         .padding(.bottom, 16)
@@ -95,47 +108,33 @@ struct DashboardView: View {
             .navigationTitle(monthAndYearTitle)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    HStack(spacing: 16) {
-                        Button {
-                            isAnnualCalendarPresented = true
-                        } label: {
-                            Image(systemName: "calendar")
-                        }
-                        .accessibilityLabel("Show annual calendar")
-
-                        Button {
-                            editorTarget = .new
-                        } label: {
-                            Image(systemName: "plus")
-                        }
-                        .accessibilityLabel("Add fixed expense")
+                    Button {
+                        editorTarget = .new
+                    } label: {
+                        Image(systemName: "plus")
                     }
+                    .accessibilityLabel("Add fixed expense")
                 }
             }
             .sheet(item: $editorTarget) { target in
                 switch target {
                 case .new:
-                    ExpenseFormView(expense: nil, month: selectedMonth)
+                    ExpenseFormView(expense: nil, month: currentMonth)
                 case .edit(let expense):
-                    ExpenseFormView(expense: expense, month: selectedMonth)
+                    ExpenseFormView(expense: expense, month: currentMonth)
                 }
             }
-            .sheet(isPresented: $isAnnualCalendarPresented) {
-                AnnualCalendarView(expenses: visibleExpenses, selection: $selectedMonth)
-                    .presentationDetents([.large])
-                    .presentationDragIndicator(.visible)
-            }
-            .onChange(of: selectedMonth) {
-                isPaidExpanded = false
+            .onChange(of: settings.locationCodes) {
+                if case .code(let code) = filter, !settings.locationCodes.contains(code) {
+                    filter = .all
+                }
             }
         }
-        .preferredColorScheme(.dark)
-        .tint(Theme.accent)
     }
 
     private func togglePaid(_ occurrence: ExpenseOccurrence) {
         withAnimation(.easeInOut(duration: 0.2)) {
-            occurrence.expense.setPaid(!occurrence.isPaid, in: selectedMonth)
+            occurrence.expense.setPaid(!occurrence.isPaid, in: currentMonth)
         }
     }
 

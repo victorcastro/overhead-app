@@ -5,27 +5,31 @@ struct ExpenseOccurrence: Identifiable {
     let expense: FixedExpense
     let dueDate: Date
     let isPaid: Bool
+    let base: Currency
 
     var id: PersistentIdentifier { expense.persistentModelID }
-    var amountInEUR: Decimal { expense.amountInEUR }
+    var amountInBase: Decimal { expense.amount(in: base) }
 }
 
 struct AnnualShareItem: Identifiable {
     let expense: FixedExpense
     let dueDate: Date
+    let base: Currency
 
     var id: PersistentIdentifier { expense.persistentModelID }
-    var monthlyShareEUR: Decimal { expense.amountInEUR / 12 }
+    var monthlyShareInBase: Decimal { expense.amount(in: base) / 12 }
 }
 
 struct MonthPlan {
     let month: Date
+    let base: Currency
     let occurrences: [ExpenseOccurrence]
     let annualAhead: [AnnualShareItem]
 
-    init(expenses: [FixedExpense], month: Date, calendar: Calendar = .current) {
+    init(expenses: [FixedExpense], month: Date, base: Currency, calendar: Calendar = .current) {
         let monthStart = calendar.dateInterval(of: .month, for: month)?.start ?? month
         self.month = monthStart
+        self.base = base
 
         var occurrences: [ExpenseOccurrence] = []
         var annualAhead: [AnnualShareItem] = []
@@ -33,11 +37,16 @@ struct MonthPlan {
         for expense in expenses {
             if let dueDate = expense.dueDate(in: month, calendar: calendar) {
                 occurrences.append(
-                    ExpenseOccurrence(expense: expense, dueDate: dueDate, isPaid: expense.isPaid(in: month))
+                    ExpenseOccurrence(
+                        expense: expense,
+                        dueDate: dueDate,
+                        isPaid: expense.isPaid(in: month),
+                        base: base
+                    )
                 )
             } else if expense.frequency == .annual {
                 let next = Self.nextAnnualDueDate(for: expense, after: monthStart, calendar: calendar)
-                annualAhead.append(AnnualShareItem(expense: expense, dueDate: next))
+                annualAhead.append(AnnualShareItem(expense: expense, dueDate: next, base: base))
             }
         }
 
@@ -62,14 +71,14 @@ struct MonthPlan {
         return expense.anchorDueDate
     }
 
-    var annualShare: Decimal { annualAhead.reduce(0) { $0 + $1.monthlyShareEUR } }
+    var annualShare: Decimal { annualAhead.reduce(0) { $0 + $1.monthlyShareInBase } }
 
     var paid: [ExpenseOccurrence] { occurrences.filter(\.isPaid) }
     var unpaid: [ExpenseOccurrence] { occurrences.filter { !$0.isPaid } }
 
-    var dueThisMonth: Decimal { occurrences.reduce(0) { $0 + $1.amountInEUR } }
-    var paidTotal: Decimal { paid.reduce(0) { $0 + $1.amountInEUR } }
-    var unpaidThisMonth: Decimal { unpaid.reduce(0) { $0 + $1.amountInEUR } }
+    var dueThisMonth: Decimal { occurrences.reduce(0) { $0 + $1.amountInBase } }
+    var paidTotal: Decimal { paid.reduce(0) { $0 + $1.amountInBase } }
+    var unpaidThisMonth: Decimal { unpaid.reduce(0) { $0 + $1.amountInBase } }
 
     var total: Decimal { dueThisMonth + annualShare }
     var stillToSetAside: Decimal { unpaidThisMonth + annualShare }

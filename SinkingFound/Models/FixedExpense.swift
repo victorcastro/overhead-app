@@ -3,24 +3,24 @@ import SwiftData
 
 @Model
 final class FixedExpense {
-    var name: String
-    var amount: Decimal
-    var currency: Currency
-    var frequency: ExpenseFrequency
-    var category: ExpenseCategory
-    var location: ExpenseLocation
-    var anchorDueDate: Date
-    var intervalMonths: Int
-    var paidPeriods: [String]
-    var createdAt: Date
+    var name: String = ""
+    var amount: Decimal = 0
+    var currency: Currency = Currency.usd
+    var frequency: ExpenseFrequency = ExpenseFrequency.monthly
+    var category: ExpenseCategory = ExpenseCategory.utilities
+    var location: String = ""
+    var anchorDueDate: Date = Date.now
+    var intervalMonths: Int = 1
+    var paidPeriods: [String] = []
+    var createdAt: Date = Date.now
 
     init(
         name: String,
         amount: Decimal,
-        currency: Currency = .eur,
+        currency: Currency = .usd,
         frequency: ExpenseFrequency = .monthly,
         category: ExpenseCategory = .utilities,
-        location: ExpenseLocation = .spain,
+        location: String = "",
         anchorDueDate: Date,
         intervalMonths: Int = 1,
         paidPeriods: [String] = [],
@@ -38,7 +38,7 @@ final class FixedExpense {
         self.createdAt = createdAt
     }
 
-    var amountInEUR: Decimal { amount / currency.unitsPerEUR }
+    func amount(in base: Currency) -> Decimal { currency.amount(amount, to: base) }
 
     func dueDate(in month: Date, calendar: Calendar = .current) -> Date? {
         guard let monthStart = calendar.dateInterval(of: .month, for: month)?.start,

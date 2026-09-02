@@ -4,6 +4,7 @@ import SwiftData
 struct ExpenseFormView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppSettings.self) private var settings
     @Query private var allExpenses: [FixedExpense]
 
     private let expense: FixedExpense?
@@ -15,7 +16,7 @@ struct ExpenseFormView: View {
     @State private var frequency: ExpenseFrequency
     @State private var intervalMonths: Int
     @State private var category: ExpenseCategory
-    @State private var location: ExpenseLocation
+    @State private var location: String
     @State private var dueDate: Date
     @State private var isPaidThisCycle: Bool
     @State private var isConfirmingDelete = false
@@ -25,11 +26,11 @@ struct ExpenseFormView: View {
         self.month = month
         _name = State(initialValue: expense?.name ?? "")
         _amountText = State(initialValue: expense.map { Self.editableAmount($0.amount) } ?? "")
-        _currency = State(initialValue: expense?.currency ?? .eur)
+        _currency = State(initialValue: expense?.currency ?? .usd)
         _frequency = State(initialValue: expense?.frequency ?? .monthly)
         _intervalMonths = State(initialValue: expense?.intervalMonths ?? 3)
         _category = State(initialValue: expense?.category ?? .utilities)
-        _location = State(initialValue: expense?.location ?? .spain)
+        _location = State(initialValue: expense?.location ?? "")
         _dueDate = State(initialValue: expense?.dueDate(in: month) ?? expense?.anchorDueDate ?? month)
         _isPaidThisCycle = State(initialValue: expense?.isPaid(in: month) ?? false)
     }
@@ -38,6 +39,12 @@ struct ExpenseFormView: View {
     private var amount: Decimal? { Self.parseAmount(amountText) }
     private var canSave: Bool { !name.trimmingCharacters(in: .whitespaces).isEmpty && (amount ?? 0) > 0 }
     private var monthName: String { month.formatted(.dateTime.month(.wide)) }
+
+    private var sortedLocationCodes: [String] {
+        settings.locationCodes.sorted {
+            (Location.name(for: $0) ?? $0).localizedStandardCompare(Location.name(for: $1) ?? $1) == .orderedAscending
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -93,10 +100,15 @@ struct ExpenseFormView: View {
 
                     DatePicker("Due date", selection: $dueDate, displayedComponents: .date)
 
-                    Picker("Location", selection: $location) {
-                        ForEach(ExpenseLocation.allCases) { Text($0.label).tag($0) }
+                    if settings.hasLocations {
+                        Picker("Location", selection: $location) {
+                            Text("None").tag("")
+                            ForEach(sortedLocationCodes, id: \.self) { code in
+                                Text(Location.name(for: code) ?? code).tag(code)
+                            }
+                        }
+                        .pickerStyle(.navigationLink)
                     }
-                    .pickerStyle(.navigationLink)
                 }
                 .listRowBackground(Theme.card)
 
@@ -149,6 +161,11 @@ struct ExpenseFormView: View {
         }
         .preferredColorScheme(.dark)
         .tint(Theme.accent)
+        .onAppear {
+            if !location.isEmpty, !settings.locationCodes.contains(location) {
+                location = ""
+            }
+        }
     }
 
     private var impactSummary: String {
@@ -157,18 +174,19 @@ struct ExpenseFormView: View {
         }
 
         let others = allExpenses.filter { $0 !== expense }
-        let currentTotal = MonthPlan(expenses: allExpenses, month: month).total
-        let baseTotal = MonthPlan(expenses: others, month: month).total
+        let currentTotal = MonthPlan(expenses: allExpenses, month: month, base: settings.baseCurrency).total
+        let baseTotal = MonthPlan(expenses: others, month: month, base: settings.baseCurrency).total
         let newTotal = baseTotal + draftContribution(amount: amount)
         let delta = newTotal - currentTotal
 
-        let newTotalText = Money.string(newTotal)
+        let newTotalText = Money.string(newTotal, currency: settings.baseCurrency)
         if delta == 0 {
             return "\(monthName) total stays at \(newTotalText)."
         }
         let verb = delta > 0 ? "Adds" : "Removes"
         let direction = delta > 0 ? "to" : "from"
-        return "\(verb) \(Money.string(abs(delta))) \(direction) \(monthName) — new total \(newTotalText)."
+        return "\(verb) \(Money.string(abs(delta), currency: settings.baseCurrency)) "
+            + "\(direction) \(monthName) — new total \(newTotalText)."
     }
 
     private func draftContribution(amount: Decimal) -> Decimal {
@@ -183,9 +201,9 @@ struct ExpenseFormView: View {
             intervalMonths: intervalMonths
         )
         if draft.dueDate(in: month) != nil {
-            return draft.amountInEUR
+            return draft.amount(in: settings.baseCurrency)
         }
-        return frequency == .annual ? draft.amountInEUR / 12 : 0
+        return frequency == .annual ? draft.amount(in: settings.baseCurrency) / 12 : 0
     }
 
     private func save() {
