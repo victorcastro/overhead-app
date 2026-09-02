@@ -28,7 +28,7 @@ permissions:
 
 concurrency:
   group: ios-ci-${{ github.workflow }}-${{ github.head_ref || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
@@ -38,6 +38,8 @@ jobs:
     name: Version and changelog
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    outputs:
+      version: ${{ steps.project-version.outputs.version }}
 
     steps:
       - name: Check out repository
@@ -47,6 +49,7 @@ jobs:
           persist-credentials: false
 
       - name: Validate project version
+        id: project-version
         shell: bash
         run: |
           versions="$(
@@ -79,6 +82,7 @@ jobs:
 
           echo "Validated Xcode project and changelog version: $version"
           echo "### Version $version validated" >> "$GITHUB_STEP_SUMMARY"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
   build-and-test:
     name: Build and unit tests
@@ -120,3 +124,40 @@ jobs:
           path: ${{ runner.temp }}/SinkingFoundTests.xcresult
           if-no-files-found: ignore
           retention-days: 7
+
+  create-tag:
+    name: Create version tag
+    needs: [version-and-changelog, build-and-test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out validated commit
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          persist-credentials: true
+
+      - name: Create and push tag
+        env:
+          VERSION: ${{ needs.version-and-changelog.outputs.version }}
+        shell: bash
+        run: |
+          tag_name="v$VERSION"
+
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag_name" > /dev/null 2>&1; then
+            echo "Tag $tag_name already exists; nothing to create."
+            echo "### Tag $tag_name already exists" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$tag_name" "$GITHUB_SHA" -m "Release $tag_name"
+          git push origin "$tag_name"
+
+          echo "Created tag $tag_name for $GITHUB_SHA"
+          echo "### Created tag $tag_name" >> "$GITHUB_STEP_SUMMARY"
