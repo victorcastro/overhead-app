@@ -25,8 +25,17 @@ struct DashboardView: View {
     @State private var isAnnualCalendarPresented = false
     @State private var isSettingsPresented = false
 
+    private var activeFilter: LocationFilter {
+        if case .code(let code) = filter, !settings.locationCodes.contains(code) { return .all }
+        return filter
+    }
+
     private var visibleExpenses: [FixedExpense] {
-        expenses.filter(filter.matches)
+        expenses.filter(activeFilter.matches)
+    }
+
+    private var showsLocation: Bool {
+        settings.hasLocations && activeFilter == .all
     }
 
     private var plan: MonthPlan {
@@ -50,13 +59,15 @@ struct DashboardView: View {
                     MonthSummaryCard(plan: plan, monthName: monthTitle)
                         .padding(.bottom, 16)
 
-                    LocationFilterPills(selection: $filter)
-                        .padding(.bottom, 16)
+                    if settings.hasLocations {
+                        LocationFilterPills(codes: settings.locationCodes, selection: $filter)
+                            .padding(.bottom, 16)
+                    }
 
                     if !plan.unpaid.isEmpty {
                         SectionHeader(title: "Unpaid · \(plan.unpaid.count)")
                         CardList(data: plan.unpaid) { occurrence in
-                            ExpenseRow(occurrence: occurrence, showsLocation: filter == .all) {
+                            ExpenseRow(occurrence: occurrence, showsLocation: showsLocation) {
                                 togglePaid(occurrence)
                             }
                             .onTapGesture { editorTarget = .edit(occurrence.expense) }
@@ -68,7 +79,7 @@ struct DashboardView: View {
                         PaidSummaryCard(
                             paid: plan.paid,
                             base: plan.base,
-                            showsLocation: filter == .all,
+                            showsLocation: showsLocation,
                             isExpanded: $isPaidExpanded,
                             onTogglePaid: togglePaid,
                             onSelect: { editorTarget = .edit($0.expense) }
@@ -78,7 +89,7 @@ struct DashboardView: View {
                     if !plan.annualAhead.isEmpty {
                         SectionHeader(title: "Saving ahead · \(plan.annualAhead.count)")
                         CardList(data: plan.annualAhead) { item in
-                            AnnualShareRow(item: item, showsLocation: filter == .all)
+                            AnnualShareRow(item: item, showsLocation: showsLocation)
                                 .onTapGesture { editorTarget = .edit(item.expense) }
                         }
                         .padding(.bottom, 16)
@@ -145,6 +156,11 @@ struct DashboardView: View {
             }
             .onChange(of: selectedMonth) {
                 isPaidExpanded = false
+            }
+            .onChange(of: settings.locationCodes) {
+                if case .code(let code) = filter, !settings.locationCodes.contains(code) {
+                    filter = .all
+                }
             }
         }
         .preferredColorScheme(.dark)

@@ -28,6 +28,31 @@ struct SettingsView: View {
                 }
                 .listRowBackground(Theme.card)
 
+                Section {
+                    NavigationLink {
+                        LocationSettingsView()
+                    } label: {
+                        HStack {
+                            Text("Locations")
+                                .foregroundStyle(Theme.primaryText)
+                            Spacer()
+                            Text(settings.locationCodes.isEmpty ? "None" : "\(settings.locationCodes.count)")
+                                .foregroundStyle(Theme.secondaryText)
+                        }
+                    }
+                } header: {
+                    Text("Locations")
+                } footer: {
+                    Text(
+                        "Tag expenses by country. With no locations defined, the location "
+                            + "filter and picker stay hidden. Deleting a location moves its "
+                            + "expenses back to Undefined."
+                    )
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.secondaryText)
+                }
+                .listRowBackground(Theme.card)
+
                 let others = Currency.allCases.filter { $0 != settings.baseCurrency }
                 if !others.isEmpty {
                     Section {

@@ -69,26 +69,35 @@ struct ProgressBar: View {
 }
 
 struct LocationFilterPills: View {
+    let codes: [String]
     @Binding var selection: LocationFilter
 
+    private var filters: [LocationFilter] {
+        let sorted = codes.sorted {
+            (Location.name(for: $0) ?? $0).localizedStandardCompare(Location.name(for: $1) ?? $1) == .orderedAscending
+        }
+        return [.all] + sorted.map(LocationFilter.code)
+    }
+
     var body: some View {
-        HStack(spacing: 8) {
-            ForEach(LocationFilter.allCases) { filter in
-                let isSelected = filter == selection
-                Button {
-                    selection = filter
-                } label: {
-                    Text(filter.label)
-                        .font(.system(size: 13, weight: isSelected ? .semibold : .medium))
-                        .foregroundStyle(isSelected ? Color.black : Theme.secondaryText)
-                        .padding(.horizontal, 15)
-                        .padding(.vertical, 7)
-                        .background(isSelected ? Color.white : Theme.card, in: Capsule())
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(filters) { filter in
+                    let isSelected = filter == selection
+                    Button {
+                        selection = filter
+                    } label: {
+                        Text(filter.label)
+                            .font(.system(size: 13, weight: isSelected ? .semibold : .medium))
+                            .foregroundStyle(isSelected ? Color.black : Theme.secondaryText)
+                            .padding(.horizontal, 15)
+                            .padding(.vertical, 7)
+                            .background(isSelected ? Color.white : Theme.card, in: Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(isSelected ? [.isSelected] : [])
                 }
-                .buttonStyle(.plain)
-                .accessibilityAddTraits(isSelected ? [.isSelected] : [])
             }
-            Spacer(minLength: 0)
         }
     }
 }
@@ -106,8 +115,8 @@ struct ExpenseRow: View {
             ? Self.paidDescription(occurrence.dueDate)
             : Self.dueDescription(occurrence.dueDate)
         parts.append(status)
-        if showsLocation, expense.location != .spain {
-            parts.append(expense.location.label)
+        if showsLocation, let name = Location.name(for: expense.location) {
+            parts.append(name)
         }
         return parts.joined(separator: " · ")
     }
@@ -199,8 +208,8 @@ struct AnnualShareRow: View {
 
     private var subtitle: String {
         var parts = ["Due \(item.dueDate.formatted(.dateTime.month(.abbreviated).year()))"]
-        if showsLocation, expense.location != .spain {
-            parts.append(expense.location.label)
+        if showsLocation, let name = Location.name(for: expense.location) {
+            parts.append(name)
         }
         return parts.joined(separator: " · ")
     }

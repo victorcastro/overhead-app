@@ -33,50 +33,28 @@ enum ExpenseCategory: String, Codable, CaseIterable, Identifiable {
     }
 }
 
-enum ExpenseLocation: String, Codable, CaseIterable, Identifiable {
-    case spain, peru
-
-    var id: String { rawValue }
-
-    var label: String {
-        switch self {
-        case .spain: "Spain"
-        case .peru: "Peru"
-        }
-    }
-
-    var defaultCurrency: Currency {
-        switch self {
-        case .spain: .eur
-        case .peru: .pen
-        }
-    }
-}
-
-enum LocationFilter: Hashable, Identifiable, CaseIterable {
+enum LocationFilter: Hashable, Identifiable {
     case all
-    case location(ExpenseLocation)
-
-    static var allCases: [LocationFilter] { [.all] + ExpenseLocation.allCases.map(LocationFilter.location) }
+    case code(String)
 
     var id: String {
         switch self {
         case .all: "all"
-        case .location(let location): location.rawValue
+        case .code(let code): "code:" + code
         }
     }
 
     var label: String {
         switch self {
         case .all: "All"
-        case .location(let location): location.label
+        case .code(let code): Location.name(for: code) ?? code
         }
     }
 
     func matches(_ expense: FixedExpense) -> Bool {
         switch self {
         case .all: true
-        case .location(let location): expense.location == location
+        case .code(let code): expense.location == code
         }
     }
 }

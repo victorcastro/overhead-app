@@ -27,6 +27,8 @@
 		CC3990E5304862DF00420738 /* SinkingFound.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SinkingFound.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC3990F4304862E000420738 /* SinkingFoundTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SinkingFoundTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC3990FE304862E000420738 /* SinkingFoundUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SinkingFoundUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC63D8273048B1DE00B1BC90 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		CC63D8303048BDA900B1BC90 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +77,8 @@
 		CC3990DC304862DF00420738 = {
 			isa = PBXGroup;
 			children = (
+				CC63D8273048B1DE00B1BC90 /* README.md */,
+				CC63D8303048BDA900B1BC90 /* CHANGELOG.md */,
 				CC3990E7304862DF00420738 /* SinkingFound */,
 				CC3990F7304862E000420738 /* SinkingFoundTests */,
 				CC399101304862E000420738 /* SinkingFoundUITests */,
