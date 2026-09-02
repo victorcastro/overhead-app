@@ -2,7 +2,6 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(AppSettings.self) private var settings
-    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         @Bindable var settings = settings
@@ -86,13 +85,6 @@ struct SettingsView: View {
             .background(Theme.background)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
-                }
-            }
         }
-        .preferredColorScheme(.dark)
-        .tint(Theme.accent)
     }
 }

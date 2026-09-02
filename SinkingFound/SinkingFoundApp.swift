@@ -26,7 +26,7 @@ struct SinkingFoundApp: App {
 
     var body: some Scene {
         WindowGroup {
-            DashboardView()
+            RootTabView()
                 .environment(settings)
         }
         .modelContainer(sharedModelContainer)

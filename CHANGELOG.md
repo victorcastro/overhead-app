@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Tab bar navigation with three top-level screens: Home (the current month), Calendar (the annual totals), and Settings.
 - Settings screen to choose the base currency (USD default, plus EUR, PEN, GBP); every total is shown in that currency and
   each expense is converted from the currency it was entered in. The choice is persisted locally.
 - User-managed locations in Settings: search a country catalog and pick which countries to track. Expenses default to
@@ -16,6 +17,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Deleting a location moves the expenses that used it back to Undefined. Choices are persisted locally.
 - Resource-conscious GitHub Actions workflow for version checks, changelog validation, linting, simulator builds, and
   unit tests, followed by automatic version tagging on `main`.
+
+### Changed
+
+- The annual calendar and the settings screen are now tabs instead of modal sheets, so they no longer open from the
+  dashboard toolbar. The dashboard toolbar keeps only the add-expense button.
+- The annual calendar shows every expense regardless of the dashboard's location filter.
+
+### Removed
+
+- Month selection. The dashboard always shows the current month, and tapping a month in the annual calendar no longer
+  changes it.
 
 ## [1.0.0] - 2026-09-02
 

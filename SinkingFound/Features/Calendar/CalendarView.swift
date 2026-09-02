@@ -1,24 +1,16 @@
 import SwiftUI
+import SwiftData
 
-struct AnnualCalendarView: View {
-    @Environment(\.dismiss) private var dismiss
-    @Binding var selection: Date
+struct CalendarView: View {
+    @Environment(AppSettings.self) private var settings
+    @Query(sort: \FixedExpense.anchorDueDate) private var expenses: [FixedExpense]
 
-    let expenses: [FixedExpense]
-    let base: Currency
-
-    @State private var displayedYear: Date
+    @State private var displayedYear = Calendar.current.dateInterval(of: .year, for: .now)?.start ?? .now
 
     private let calendar = Calendar.current
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
 
-    init(expenses: [FixedExpense], base: Currency, selection: Binding<Date>) {
-        self.expenses = expenses
-        self.base = base
-        _selection = selection
-        let year = Calendar.current.dateInterval(of: .year, for: selection.wrappedValue)?.start
-        _displayedYear = State(initialValue: year ?? selection.wrappedValue)
-    }
+    private var base: Currency { settings.baseCurrency }
 
     private var months: [AnnualMonthSummary] {
         (0..<12).compactMap { offset in
@@ -64,7 +56,7 @@ struct AnnualCalendarView: View {
 
                     LazyVGrid(columns: columns, spacing: 10) {
                         ForEach(months) { month in
-                            monthButton(month)
+                            monthCard(month)
                         }
                     }
 
@@ -77,13 +69,7 @@ struct AnnualCalendarView: View {
             .scrollIndicators(.hidden)
             .navigationTitle("Annual calendar")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
-                }
-            }
         }
-        .preferredColorScheme(.dark)
     }
 
     private var yearHeader: some View {
@@ -110,57 +96,51 @@ struct AnnualCalendarView: View {
         }
     }
 
-    private func monthButton(_ month: AnnualMonthSummary) -> some View {
+    private func monthCard(_ month: AnnualMonthSummary) -> some View {
         let isCurrent = calendar.isDate(month.date, equalTo: .now, toGranularity: .month)
-        let isSelected = calendar.isDate(month.date, equalTo: selection, toGranularity: .month)
         let color = statusColor(for: month.total)
 
-        return Button {
-            selection = month.date
-            dismiss()
-        } label: {
-            VStack(alignment: .leading, spacing: 0) {
-                HStack(spacing: 6) {
-                    Text(month.date.formatted(.dateTime.month(.abbreviated)).uppercased())
-                        .font(.caption.weight(.semibold))
-                    Spacer(minLength: 0)
-                    if isCurrent {
-                        Circle()
-                            .fill(Theme.positive)
-                            .frame(width: 7, height: 7)
-                            .accessibilityHidden(true)
-                    }
+        return VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 6) {
+                Text(month.date.formatted(.dateTime.month(.abbreviated)).uppercased())
+                    .font(.caption.weight(.semibold))
+                Spacer(minLength: 0)
+                if isCurrent {
+                    Circle()
+                        .fill(Theme.positive)
+                        .frame(width: 7, height: 7)
+                        .accessibilityHidden(true)
                 }
-                .foregroundStyle(isCurrent ? Theme.positive : Theme.primaryText)
+            }
+            .foregroundStyle(isCurrent ? Theme.positive : Theme.primaryText)
 
-                Spacer()
+            Spacer()
 
-                Text(Money.string(month.total, currency: base))
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(color)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.75)
+            Text(Money.string(month.total, currency: base))
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(color)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
 
-                GeometryReader { proxy in
-                    ZStack(alignment: .leading) {
-                        Capsule().fill(Theme.control.opacity(0.45))
-                        Capsule()
-                            .fill(color)
-                            .frame(width: barWidth(total: month.total, available: proxy.size.width))
-                    }
+            GeometryReader { proxy in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(Theme.control.opacity(0.45))
+                    Capsule()
+                        .fill(color)
+                        .frame(width: barWidth(total: month.total, available: proxy.size.width))
                 }
-                .frame(height: 4)
-                .padding(.top, 14)
             }
-            .frame(maxWidth: .infinity, minHeight: 82, alignment: .leading)
-            .padding(12)
-            .background(Theme.card, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 13, style: .continuous)
-                    .stroke(isSelected || isCurrent ? Theme.positive : Theme.separator, lineWidth: 1)
-            }
+            .frame(height: 4)
+            .padding(.top, 14)
         }
-        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity, minHeight: 82, alignment: .leading)
+        .padding(12)
+        .background(Theme.card, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 13, style: .continuous)
+                .stroke(isCurrent ? Theme.positive : Theme.separator, lineWidth: 1)
+        }
+        .accessibilityElement(children: .ignore)
         .accessibilityLabel(monthAccessibilityLabel(month, isCurrent: isCurrent))
     }
 

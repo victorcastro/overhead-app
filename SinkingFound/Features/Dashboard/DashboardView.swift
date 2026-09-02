@@ -21,9 +21,8 @@ struct DashboardView: View {
     @State private var filter: LocationFilter = .all
     @State private var isPaidExpanded = false
     @State private var editorTarget: ExpenseEditorTarget?
-    @State private var selectedMonth = Calendar.current.dateInterval(of: .month, for: .now)?.start ?? .now
-    @State private var isAnnualCalendarPresented = false
-    @State private var isSettingsPresented = false
+
+    private let currentMonth = Calendar.current.dateInterval(of: .month, for: .now)?.start ?? .now
 
     private var activeFilter: LocationFilter {
         if case .code(let code) = filter, !settings.locationCodes.contains(code) { return .all }
@@ -39,15 +38,15 @@ struct DashboardView: View {
     }
 
     private var plan: MonthPlan {
-        MonthPlan(expenses: visibleExpenses, month: selectedMonth, base: settings.baseCurrency)
+        MonthPlan(expenses: visibleExpenses, month: currentMonth, base: settings.baseCurrency)
     }
 
     private var monthTitle: String {
-        selectedMonth.formatted(.dateTime.month(.wide))
+        currentMonth.formatted(.dateTime.month(.wide))
     }
 
     private var monthAndYearTitle: String {
-        selectedMonth.formatted(.dateTime.month(.wide).year())
+        currentMonth.formatted(.dateTime.month(.wide).year())
     }
 
     var body: some View {
@@ -108,54 +107,22 @@ struct DashboardView: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle(monthAndYearTitle)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        isSettingsPresented = true
-                    } label: {
-                        Image(systemName: "gearshape")
-                    }
-                    .accessibilityLabel("Settings")
-                }
                 ToolbarItem(placement: .topBarTrailing) {
-                    HStack(spacing: 16) {
-                        Button {
-                            isAnnualCalendarPresented = true
-                        } label: {
-                            Image(systemName: "calendar")
-                        }
-                        .accessibilityLabel("Show annual calendar")
-
-                        Button {
-                            editorTarget = .new
-                        } label: {
-                            Image(systemName: "plus")
-                        }
-                        .accessibilityLabel("Add fixed expense")
+                    Button {
+                        editorTarget = .new
+                    } label: {
+                        Image(systemName: "plus")
                     }
+                    .accessibilityLabel("Add fixed expense")
                 }
             }
             .sheet(item: $editorTarget) { target in
                 switch target {
                 case .new:
-                    ExpenseFormView(expense: nil, month: selectedMonth)
+                    ExpenseFormView(expense: nil, month: currentMonth)
                 case .edit(let expense):
-                    ExpenseFormView(expense: expense, month: selectedMonth)
+                    ExpenseFormView(expense: expense, month: currentMonth)
                 }
-            }
-            .sheet(isPresented: $isAnnualCalendarPresented) {
-                AnnualCalendarView(
-                    expenses: visibleExpenses,
-                    base: settings.baseCurrency,
-                    selection: $selectedMonth
-                )
-                .presentationDetents([.large])
-                .presentationDragIndicator(.visible)
-            }
-            .sheet(isPresented: $isSettingsPresented) {
-                SettingsView()
-            }
-            .onChange(of: selectedMonth) {
-                isPaidExpanded = false
             }
             .onChange(of: settings.locationCodes) {
                 if case .code(let code) = filter, !settings.locationCodes.contains(code) {
@@ -163,13 +130,11 @@ struct DashboardView: View {
                 }
             }
         }
-        .preferredColorScheme(.dark)
-        .tint(Theme.accent)
     }
 
     private func togglePaid(_ occurrence: ExpenseOccurrence) {
         withAnimation(.easeInOut(duration: 0.2)) {
-            occurrence.expense.setPaid(!occurrence.isPaid, in: selectedMonth)
+            occurrence.expense.setPaid(!occurrence.isPaid, in: currentMonth)
         }
     }
 

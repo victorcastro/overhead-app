@@ -139,16 +139,24 @@ SinkingFound/
 ├── Design/
 │   └── Theme.swift                  # Shared colors, spacing, and card styling
 ├── Features/
+│   ├── Calendar/
+│   │   └── CalendarView.swift       # Twelve-month expense overview
 │   ├── Dashboard/
-│   │   ├── AnnualCalendarView.swift # Twelve-month expense overview
 │   │   ├── DashboardComponents.swift
-│   │   └── DashboardView.swift      # Main monthly planning screen
-│   └── ExpenseForm/
-│       └── ExpenseFormView.swift    # Create, edit, and delete expenses
+│   │   └── DashboardView.swift      # Home screen for the current month
+│   ├── ExpenseForm/
+│   │   └── ExpenseFormView.swift    # Create, edit, and delete expenses
+│   ├── Root/
+│   │   └── RootTabView.swift        # Home, Calendar, and Settings tabs
+│   └── Settings/
+│       ├── LocationSettingsView.swift
+│       └── SettingsView.swift       # Base currency, locations, exchange rates
 ├── Models/
+│   ├── AppSettings.swift            # Base currency and locations, persisted locally
 │   ├── Currency.swift               # Currency metadata and money formatting
 │   ├── ExpenseAttributes.swift      # Frequency, category, and location types
 │   ├── FixedExpense.swift           # SwiftData persistence model
+│   ├── Location.swift               # Country catalog
 │   └── MonthPlan.swift              # Monthly planning calculations
 └── SinkingFoundApp.swift            # App entry point and model container
 ```
