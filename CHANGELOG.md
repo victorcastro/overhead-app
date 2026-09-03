@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Month picker on Home, opened with the calendar button in the navigation bar. It shows the twelve months of a year in
   a grid, marks the current and the selected one, and moves between years within a window of the current year plus or
   minus one. A "This month" shortcut jumps back to today.
+- Swipe between months on Home. Dragging from the left edge toward the centre goes back a month and dragging from the
+  right edge goes forward, across the same window the picker offers. It stops at the ends instead of wrapping around.
 - Home now reflects the selected month everywhere: the title, the summary card, the unpaid, paid and saving-ahead
   sections, the empty state, and the paid toggle, which records the period you are looking at. Editing an expense opens
   the form on that same month, while the add button still anchors a new expense to the real current month.

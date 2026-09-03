@@ -23,9 +23,10 @@ struct DashboardView: View {
     @State private var filter: LocationFilter = .all
     @State private var isPaidExpanded = false
     @State private var activeSheet: DashboardSheet?
-    @State private var selectedMonth = Calendar.current.dateInterval(of: .month, for: .now)?.start ?? .now
+    @State private var selectedMonth = MonthWindow.currentMonth()
 
-    private let currentMonth = Calendar.current.dateInterval(of: .month, for: .now)?.start ?? .now
+    private let currentMonth = MonthWindow.currentMonth()
+    private let availableMonths = MonthWindow.months()
 
     private var activeFilter: LocationFilter {
         if case .code(let code) = filter, !settings.locationCodes.contains(code) { return .all }
@@ -40,12 +41,12 @@ struct DashboardView: View {
         settings.hasLocations && activeFilter == .all
     }
 
-    private var plan: MonthPlan {
-        MonthPlan(expenses: visibleExpenses, month: selectedMonth, base: settings.baseCurrency)
+    private func plan(for month: Date) -> MonthPlan {
+        MonthPlan(expenses: visibleExpenses, month: month, base: settings.baseCurrency)
     }
 
-    private var monthTitle: String {
-        selectedMonth.formatted(.dateTime.month(.wide))
+    private func monthTitle(for month: Date) -> String {
+        month.formatted(.dateTime.month(.wide))
     }
 
     private var monthAndYearTitle: String {
@@ -54,59 +55,14 @@ struct DashboardView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                let plan = plan
-
-                VStack(spacing: 0) {
-                    MonthSummaryCard(plan: plan, monthName: monthTitle)
-                        .padding(.bottom, 16)
-
-                    if settings.hasLocations {
-                        LocationFilterPills(codes: settings.locationCodes, selection: $filter)
-                            .padding(.bottom, 16)
-                    }
-
-                    if !plan.unpaid.isEmpty {
-                        SectionHeader(title: "Unpaid · \(plan.unpaid.count)")
-                        CardList(data: plan.unpaid) { occurrence in
-                            ExpenseRow(occurrence: occurrence, showsLocation: showsLocation) {
-                                togglePaid(occurrence)
-                            }
-                            .onTapGesture { activeSheet = .editExpense(occurrence.expense) }
-                        }
-                        .padding(.bottom, 16)
-                    }
-
-                    if !plan.paid.isEmpty {
-                        PaidSummaryCard(
-                            paid: plan.paid,
-                            base: plan.base,
-                            showsLocation: showsLocation,
-                            isExpanded: $isPaidExpanded,
-                            onTogglePaid: togglePaid,
-                            onSelect: { activeSheet = .editExpense($0.expense) }
-                        )
-                    }
-
-                    if !plan.annualAhead.isEmpty {
-                        SectionHeader(title: "Saving ahead · \(plan.annualAhead.count)")
-                        CardList(data: plan.annualAhead) { item in
-                            AnnualShareRow(item: item, showsLocation: showsLocation)
-                                .onTapGesture { activeSheet = .editExpense(item.expense) }
-                        }
-                        .padding(.bottom, 16)
-                    }
-
-                    if plan.occurrences.isEmpty && plan.annualAhead.isEmpty {
-                        EmptyMonthView(monthTitle: monthTitle)
-                            .padding(.top, 24)
-                    }
+            TabView(selection: $selectedMonth) {
+                ForEach(availableMonths, id: \.self) { month in
+                    monthPage(month)
+                        .tag(month)
                 }
-                .padding(.horizontal, Theme.horizontalPadding)
-                .padding(.top, 8)
             }
+            .tabViewStyle(.page(indexDisplayMode: .never))
             .background(Theme.background)
-            .scrollIndicators(.hidden)
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle(monthAndYearTitle)
             .toolbar {
@@ -149,9 +105,70 @@ struct DashboardView: View {
         }
     }
 
-    private func togglePaid(_ occurrence: ExpenseOccurrence) {
+    private func monthPage(_ month: Date) -> some View {
+        ScrollView {
+            monthSections(month)
+                .padding(.horizontal, Theme.horizontalPadding)
+                .padding(.top, 8)
+        }
+        .background(Theme.background)
+        .scrollIndicators(.hidden)
+    }
+
+    @ViewBuilder
+    private func monthSections(_ month: Date) -> some View {
+        let plan = plan(for: month)
+
+        VStack(spacing: 0) {
+            MonthSummaryCard(plan: plan, monthName: monthTitle(for: month))
+                .padding(.bottom, 16)
+
+            if settings.hasLocations {
+                LocationFilterPills(codes: settings.locationCodes, selection: $filter)
+                    .padding(.bottom, 16)
+            }
+
+            if !plan.unpaid.isEmpty {
+                SectionHeader(title: "Unpaid · \(plan.unpaid.count)")
+                CardList(data: plan.unpaid) { occurrence in
+                    ExpenseRow(occurrence: occurrence, showsLocation: showsLocation) {
+                        togglePaid(occurrence, in: month)
+                    }
+                    .onTapGesture { activeSheet = .editExpense(occurrence.expense) }
+                }
+                .padding(.bottom, 16)
+            }
+
+            if !plan.paid.isEmpty {
+                PaidSummaryCard(
+                    paid: plan.paid,
+                    base: plan.base,
+                    showsLocation: showsLocation,
+                    isExpanded: $isPaidExpanded,
+                    onTogglePaid: { togglePaid($0, in: month) },
+                    onSelect: { activeSheet = .editExpense($0.expense) }
+                )
+            }
+
+            if !plan.annualAhead.isEmpty {
+                SectionHeader(title: "Saving ahead · \(plan.annualAhead.count)")
+                CardList(data: plan.annualAhead) { item in
+                    AnnualShareRow(item: item, showsLocation: showsLocation)
+                        .onTapGesture { activeSheet = .editExpense(item.expense) }
+                }
+                .padding(.bottom, 16)
+            }
+
+            if plan.occurrences.isEmpty && plan.annualAhead.isEmpty {
+                EmptyMonthView(monthTitle: monthTitle(for: month))
+                    .padding(.top, 24)
+            }
+        }
+    }
+
+    private func togglePaid(_ occurrence: ExpenseOccurrence, in month: Date) {
         withAnimation(.easeInOut(duration: 0.2)) {
-            occurrence.expense.setPaid(!occurrence.isPaid, in: selectedMonth)
+            occurrence.expense.setPaid(!occurrence.isPaid, in: month)
         }
     }
 

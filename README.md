@@ -63,8 +63,9 @@ A recurring expense can end: never, after a number of payments counting the firs
 past. One-time expenses have no end rule. A series that has ended disappears from later months, from the annual totals
 and from the share saved ahead, and its final payment reads "last payment" in the list.
 
-It opens on the current month. The calendar button in the navigation bar opens a picker with the twelve months of a
-year, reachable from the current year minus one to the current year plus one, plus a shortcut back to this month.
+It opens on the current month. Swiping left or right moves one month at a time, and the calendar button in the
+navigation bar opens a picker with the twelve months of a year. Both cover the same window, from the current year minus
+one to the current year plus one, and the picker adds a shortcut back to this month.
 Marking an expense as paid records the month you are looking at, and adding a new expense always anchors it to the real
 current month.
 
@@ -164,7 +165,8 @@ SinkingFound/
 │   ├── FixedExpense.swift           # SwiftData persistence model
 │   ├── KeyValueStore.swift          # Testable seam over NSUbiquitousKeyValueStore
 │   ├── Location.swift               # Country catalog
-│   └── MonthPlan.swift              # Monthly planning calculations
+│   ├── MonthPlan.swift              # Monthly planning calculations
+│   └── MonthWindow.swift            # The range of months Home can reach
 ├── SinkingFound.entitlements        # iCloud container, CloudKit, and key-value store
 └── SinkingFoundApp.swift            # App entry point and model container
 ```

@@ -11,39 +11,19 @@ struct MonthPickerSheet: View {
 
     init(selection: Binding<Date>) {
         _selection = selection
-        _displayedYear = State(initialValue: Self.clampedYear(for: selection.wrappedValue))
-    }
-
-    private static func yearStart(of date: Date, calendar: Calendar = .current) -> Date {
-        calendar.dateInterval(of: .year, for: date)?.start ?? date
-    }
-
-    private static var currentYear: Date {
-        yearStart(of: .now)
-    }
-
-    private static var earliestYear: Date {
-        Calendar.current.date(byAdding: .year, value: -1, to: currentYear) ?? currentYear
-    }
-
-    private static var latestYear: Date {
-        Calendar.current.date(byAdding: .year, value: 1, to: currentYear) ?? currentYear
-    }
-
-    private static func clampedYear(for date: Date) -> Date {
-        min(max(yearStart(of: date), earliestYear), latestYear)
+        _displayedYear = State(initialValue: MonthWindow.clampedYear(for: selection.wrappedValue))
     }
 
     private var currentMonth: Date {
-        calendar.dateInterval(of: .month, for: .now)?.start ?? .now
+        MonthWindow.currentMonth(calendar: calendar)
     }
 
     private var canGoBack: Bool {
-        displayedYear > Self.earliestYear
+        displayedYear > MonthWindow.firstYear(calendar: calendar)
     }
 
     private var canGoForward: Bool {
-        displayedYear < Self.latestYear
+        displayedYear < MonthWindow.lastYear(calendar: calendar)
     }
 
     private var isOnCurrentMonth: Bool {
@@ -158,14 +138,14 @@ struct MonthPickerSheet: View {
     }
 
     private func select(_ month: Date) {
-        selection = calendar.dateInterval(of: .month, for: month)?.start ?? month
+        selection = MonthWindow.monthStart(for: month, calendar: calendar)
         dismiss()
     }
 
     private func moveYear(by offset: Int) {
         guard let year = calendar.date(byAdding: .year, value: offset, to: displayedYear) else { return }
         withAnimation(.easeInOut(duration: 0.2)) {
-            displayedYear = Self.clampedYear(for: year)
+            displayedYear = MonthWindow.clampedYear(for: year, calendar: calendar)
         }
     }
 }
