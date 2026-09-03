@@ -27,7 +27,6 @@ struct ExpenseFormView: View {
     @State private var category: ExpenseCategory
     @State private var location: String
     @State private var dueDate: Date
-    @State private var isPaidThisCycle: Bool
     @State private var isConfirmingDelete = false
     @FocusState private var focusedField: Field?
 
@@ -97,7 +96,6 @@ struct ExpenseFormView: View {
         _category = State(initialValue: expense?.category ?? .utilities)
         _location = State(initialValue: expense?.location ?? "")
         _dueDate = State(initialValue: expense?.dueDate(in: month) ?? expense?.anchorDueDate ?? month)
-        _isPaidThisCycle = State(initialValue: expense?.isPaid(in: month) ?? false)
     }
 
     var body: some View {
@@ -131,6 +129,10 @@ struct ExpenseFormView: View {
                             }
                         }
                     }
+                } footer: {
+                    Text(impactSummary)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.secondaryText)
                 }
                 .listRowBackground(Theme.card)
 
@@ -198,17 +200,6 @@ struct ExpenseFormView: View {
                     }
                 }
                 .listRowBackground(Theme.card)
-
-                Section {
-                    Toggle("Marked as paid", isOn: $isPaidThisCycle)
-                        .listRowBackground(Theme.card)
-                } header: {
-                    Text("This cycle")
-                } footer: {
-                    Text(impactSummary)
-                        .font(.system(size: 12))
-                        .foregroundStyle(Theme.secondaryText)
-                }
 
                 if isEditing {
                     Section {
@@ -311,7 +302,6 @@ struct ExpenseFormView: View {
         target.category = category
         target.location = location
         target.anchorDueDate = dueDate
-        target.setPaid(isPaidThisCycle, in: month)
 
         dismiss()
     }

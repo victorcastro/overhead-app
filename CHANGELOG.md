@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- The "Marked as paid" toggle in the expense form. Paid state is set from Home, on the month you are looking at.
 - Year navigation in the Calendar tab. The chevrons beside the year are gone and the year is a fixed label, so the tab
   always shows the twelve months of the current year.
 
