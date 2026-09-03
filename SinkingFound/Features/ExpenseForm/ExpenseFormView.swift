@@ -45,35 +45,9 @@ struct ExpenseFormView: View {
         frequency == .oneTime ? .never : endRule
     }
 
-    private var endSummary: String? {
-        switch endRule {
-        case .never:
-            return nil
-        case .onDate:
-            return "Nothing is due after \(endDate.formatted(.dateTime.month(.wide).day().year()))."
-        case .afterOccurrences:
-            guard let last = draft(amount: amount ?? 1).finalDueDate() else { return nil }
-            return "Counting the first one, the last payment falls on "
-                + "\(last.formatted(.dateTime.month(.wide).day().year()))."
-        }
-    }
+    private var endSummary: String? { ExpenseSummary.end(draft(amount: amount ?? 1)) }
 
-    private var frequencySummary: String {
-        let dayFormat = Date.FormatStyle.dateTime.month(.wide).day().year()
-
-        guard let next = draft(amount: amount ?? 1).nextDueDate() else {
-            return "The last payment was on \(dueDate.formatted(dayFormat))."
-        }
-
-        let date = next.formatted(dayFormat)
-
-        switch frequency {
-        case .oneTime: return "One-time payment on \(date)."
-        case .monthly: return "Next payment on \(date), then every month."
-        case .annual: return "Next payment on \(date), then every year."
-        case .other: return "Next payment on \(date), then every \(intervalMonths) months."
-        }
-    }
+    private var frequencySummary: String { ExpenseSummary.frequency(draft(amount: amount ?? 1)) }
 
     init(expense: FixedExpense?, month: Date, showsCancelButton: Bool = true) {
         self.expense = expense
@@ -111,50 +85,55 @@ struct ExpenseFormView: View {
             .foregroundStyle(Theme.secondaryText)
     }
 
-    private var amountHeader: some View {
-        VStack(spacing: 10) {
-            HStack(alignment: .firstTextBaseline, spacing: currency.format.symbolSpacing ? 10 : 2) {
-                if currency.format.symbolPosition == .leading {
-                    currencySymbol
-                }
-
-                TextField("0", text: $amountText)
-                    .keyboardType(.decimalPad)
-                    .font(.system(size: amountFontSize, weight: .semibold, design: .rounded))
-                    .foregroundStyle(Theme.primaryText)
-                    .focused($focusedField, equals: .amount)
-                    .textFieldStyle(.plain)
-                    .fixedSize()
-                    .onChange(of: amountText) { oldValue, newValue in
-                        amountText = AmountInput.accepted(newValue, for: currency, limit: Self.amountLimit) ?? oldValue
-                    }
-                    .onChange(of: currency) {
-                        amountText = AmountInput.accepted(amountText, for: currency, limit: Self.amountLimit)
-                            ?? amountText
-                    }
-
-                if currency.format.symbolPosition == .trailing {
-                    currencySymbol
-                }
+    private var currencyMenu: some View {
+        Menu {
+            Picker("Currency", selection: $currency) {
+                ForEach(Currency.allCases) { Text($0.rawValue).tag($0) }
             }
-            .frame(maxWidth: .infinity)
-            .contentShape(Rectangle())
-            .onTapGesture { focusedField = .amount }
+        } label: {
+            HStack(spacing: 3) {
+                Text(currency.rawValue)
+                Image(systemName: "chevron.down").font(.system(size: 10, weight: .semibold))
+            }
+            .font(.system(size: 13, weight: .medium))
+            .foregroundStyle(Theme.secondaryText)
+        }
+    }
 
-            Menu {
-                Picker("Currency", selection: $currency) {
-                    ForEach(Currency.allCases) { Text($0.rawValue).tag($0) }
+    private var amountField: some View {
+        HStack(alignment: .firstTextBaseline, spacing: currency.format.symbolSpacing ? 10 : 2) {
+            if currency.format.symbolPosition == .leading {
+                currencySymbol
+            }
+
+            TextField("0", text: $amountText)
+                .keyboardType(.decimalPad)
+                .font(.system(size: amountFontSize, weight: .semibold, design: .rounded))
+                .foregroundStyle(Theme.primaryText)
+                .focused($focusedField, equals: .amount)
+                .textFieldStyle(.plain)
+                .fixedSize()
+                .onChange(of: amountText) { oldValue, newValue in
+                    amountText = AmountInput.accepted(newValue, for: currency, limit: Self.amountLimit) ?? oldValue
                 }
-            } label: {
-                HStack(spacing: 3) {
-                    Text(currency.rawValue)
-                    Image(systemName: "chevron.down").font(.system(size: 10, weight: .semibold))
+                .onChange(of: currency) {
+                    amountText = AmountInput.accepted(amountText, for: currency, limit: Self.amountLimit) ?? amountText
                 }
-                .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(Theme.secondaryText)
+
+            if currency.format.symbolPosition == .trailing {
+                currencySymbol
             }
         }
+    }
+
+    private var amountHeader: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 10) {
+            currencyMenu
+            amountField
+        }
         .frame(maxWidth: .infinity)
+        .contentShape(Rectangle())
+        .onTapGesture { focusedField = .amount }
         .padding(.horizontal, Theme.horizontalPadding)
         .padding(.bottom, 20)
     }
@@ -166,6 +145,24 @@ struct ExpenseFormView: View {
             }
             .listRowInsets(EdgeInsets())
             .listRowBackground(Color.clear)
+
+            Section {
+                Picker("Frequency", selection: $frequency) {
+                    ForEach(ExpenseFrequency.allCases) { Text($0.label).tag($0) }
+                }
+                .pickerStyle(.segmented)
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+
+                if frequency == .other {
+                    Stepper("Every \(intervalMonths) months", value: $intervalMonths, in: 2...36)
+                        .listRowBackground(Theme.card)
+                }
+            } footer: {
+                Text(frequencySummary)
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.secondaryText)
+            }
 
             Section {
                 LabeledRow(label: "Name") {
@@ -196,24 +193,6 @@ struct ExpenseFormView: View {
                 }
             }
             .listRowBackground(Theme.card)
-
-            Section {
-                Picker("Frequency", selection: $frequency) {
-                    ForEach(ExpenseFrequency.allCases) { Text($0.label).tag($0) }
-                }
-                .pickerStyle(.segmented)
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(Color.clear)
-
-                if frequency == .other {
-                    Stepper("Every \(intervalMonths) months", value: $intervalMonths, in: 2...36)
-                        .listRowBackground(Theme.card)
-                }
-            } footer: {
-                Text(frequencySummary)
-                    .font(.system(size: 12))
-                    .foregroundStyle(Theme.secondaryText)
-            }
 
             if frequency != .oneTime {
                 Section {
