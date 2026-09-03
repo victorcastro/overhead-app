@@ -71,10 +71,15 @@ current month.
 
 ### Annual calendar
 
-The Calendar tab shows one card per month of the current year, whose number sits above the grid as a fixed label. Each
-card shows that month's fixed-cost total, a bar scaled against the year's heaviest month, and a color comparing it to
-the year's monthly average: normal up to 110%, above average up to 150%, heavy beyond that. It reads every expense, so
-the dashboard's location filter does not narrow these totals.
+The Calendar tab shows one card per month of a year, whose number sits above the grid. It opens on the current year.
+Each card shows that month's fixed-cost total, a bar scaled against the year's heaviest month, and a color comparing
+it to the year's monthly average: normal up to 110%, above average up to 150%, heavy beyond that. It reads every
+expense, so the dashboard's location filter does not narrow these totals.
+
+Swiping left or right moves one year at a time. The range comes from the data: back to the oldest year holding a
+payment and forward to the last one, capped five years ahead so an expense without an end date does not open an endless
+range. Years with nothing in them sit inside that range and can still be swiped through, and a "This year" button
+appears in the navigation bar while the year on screen is not the current one.
 
 Tapping a card opens a read-only summary of that month: its total plus the expenses split into unpaid, paid and saving
 ahead. Marking as paid and editing stay on Home.
@@ -166,7 +171,8 @@ SinkingFound/
 │   ├── KeyValueStore.swift          # Testable seam over NSUbiquitousKeyValueStore
 │   ├── Location.swift               # Country catalog
 │   ├── MonthPlan.swift              # Monthly planning calculations
-│   └── MonthWindow.swift            # The range of months Home can reach
+│   ├── MonthWindow.swift            # The range of months Home can reach
+│   └── YearWindow.swift             # The range of years the calendar can reach
 ├── SinkingFound.entitlements        # iCloud container, CloudKit, and key-value store
 └── SinkingFoundApp.swift            # App entry point and model container
 ```
