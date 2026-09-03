@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-09-03
+
+### Changed
+
+- Minimum deployment target raised to iOS 26.0 for every target, including the
+  project-level build configurations. Xcode 26 is now required to build.
+- Test targets now match the app target's `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`.
+- CI runs on the `macos-26` runner against an iPhone 17 simulator.
+
 ## [1.2.0] - 2026-09-03
 
 ### Added

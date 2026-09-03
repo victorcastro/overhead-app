@@ -101,8 +101,8 @@ When a due day does not exist in a target month, SinkingFound uses that month's 
 
 ## Requirements
 
-- macOS with Xcode 16 or later
-- iOS 18.0 or later
+- macOS with Xcode 26 or later
+- iOS 26.0 or later
 - SwiftLint, when running the repository's lint command locally
 
 The project has no third-party runtime dependencies and does not require dependency installation.
@@ -111,7 +111,7 @@ The project has no third-party runtime dependencies and does not require depende
 
 1. Clone or fork this repository.
 2. Open `SinkingFound.xcodeproj` in Xcode.
-3. Select the `SinkingFound` scheme and an iOS 18+ simulator or device.
+3. Select the `SinkingFound` scheme and an iOS 26+ simulator or device.
 4. Build and run with <kbd>⌘</kbd><kbd>R</kbd>.
 
 You can also build from the command line:
@@ -131,7 +131,7 @@ Run the test suite with a simulator available on your machine:
 xcodebuild test \
   -project SinkingFound.xcodeproj \
   -scheme SinkingFound \
-  -destination 'platform=iOS Simulator,name=iPhone 16'
+  -destination 'platform=iOS Simulator,name=iPhone 17'
 ```
 
 Run lint checks separately with:

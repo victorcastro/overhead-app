@@ -78,7 +78,7 @@ jobs:
   build-and-test:
     name: Build and unit tests
     needs: version-and-changelog
-    runs-on: macos-15-intel
+    runs-on: macos-26
     timeout-minutes: 20
 
     steps:
@@ -99,7 +99,7 @@ jobs:
             -project SinkingFound.xcodeproj \
             -scheme SinkingFound \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+            -destination 'platform=iOS Simulator,name=iPhone 17' \
             -derivedDataPath "$RUNNER_TEMP/DerivedData" \
             -resultBundlePath "$RUNNER_TEMP/SinkingFoundTests.xcresult" \
             -only-testing:SinkingFoundTests \
