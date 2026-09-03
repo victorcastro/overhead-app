@@ -16,7 +16,6 @@ enum DashboardSheet: Identifiable {
 }
 
 struct DashboardView: View {
-    @Environment(\.modelContext) private var modelContext
     @Environment(AppSettings.self) private var settings
     @Query(sort: \FixedExpense.anchorDueDate) private var expenses: [FixedExpense]
 
@@ -171,7 +170,6 @@ struct DashboardView: View {
             occurrence.expense.setPaid(!occurrence.isPaid, in: month)
         }
     }
-
 }
 
 struct EmptyMonthView: View {

@@ -26,7 +26,7 @@ enum Currency: String, Codable, CaseIterable, Identifiable {
         }
     }
 
-    var unitsPerEUR: Decimal {
+    private var unitsPerEUR: Decimal {
         switch self {
         case .eur: 1
         case .pen: Decimal(407) / 100

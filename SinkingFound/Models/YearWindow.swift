@@ -2,7 +2,7 @@ import Foundation
 
 enum YearWindow {
     static let yearsForwardCap = 5
-    static let maximumYears = 200
+    private static let maximumYears = 200
 
     static func years(for expenses: [FixedExpense], calendar: Calendar = .current) -> [Date] {
         let currentYear = MonthWindow.yearStart(for: .now, calendar: calendar)

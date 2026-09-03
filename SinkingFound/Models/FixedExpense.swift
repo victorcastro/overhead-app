@@ -79,7 +79,7 @@ final class FixedExpense {
         return date
     }
 
-    var stepMonths: Int {
+    private var stepMonths: Int {
         switch frequency {
         case .monthly, .oneTime: 1
         case .annual: 12
@@ -102,7 +102,7 @@ final class FixedExpense {
         }
     }
 
-    func occurrenceIndex(on date: Date, calendar: Calendar = .current) -> Int? {
+    private func occurrenceIndex(on date: Date, calendar: Calendar = .current) -> Int? {
         guard let monthStart = calendar.dateInterval(of: .month, for: date)?.start,
               let anchorMonthStart = calendar.dateInterval(of: .month, for: anchorDueDate)?.start,
               let elapsed = calendar.dateComponents([.month], from: anchorMonthStart, to: monthStart).month,
@@ -146,7 +146,7 @@ final class FixedExpense {
         }
     }
 
-    static func periodKey(for month: Date, calendar: Calendar = .current) -> String {
+    private static func periodKey(for month: Date, calendar: Calendar = .current) -> String {
         let components = calendar.dateComponents([.year, .month], from: month)
         return String(format: "%04d-%02d", components.year ?? 0, components.month ?? 0)
     }

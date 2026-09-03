@@ -1,8 +1,8 @@
 import Foundation
 
 enum MonthWindow {
-    static let yearsBack = 1
-    static let yearsForward = 1
+    private static let yearsBack = 1
+    private static let yearsForward = 1
 
     static func monthStart(for date: Date, calendar: Calendar = .current) -> Date {
         calendar.dateInterval(of: .month, for: date)?.start ?? date
