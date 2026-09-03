@@ -52,8 +52,12 @@ struct DashboardView: View {
         month.formatted(.dateTime.month(.wide))
     }
 
-    private var monthAndYearTitle: String {
-        selectedMonth.formatted(.dateTime.month(.wide).year())
+    private var monthNameTitle: String {
+        selectedMonth.formatted(.dateTime.month(.wide))
+    }
+
+    private var yearSubtitle: String {
+        selectedMonth.formatted(.dateTime.year())
     }
 
     var body: some View {
@@ -67,7 +71,8 @@ struct DashboardView: View {
             .tabViewStyle(.page(indexDisplayMode: .never))
             .background(Theme.background)
             .navigationBarTitleDisplayMode(.inline)
-            .navigationTitle(monthAndYearTitle)
+            .navigationTitle(monthNameTitle)
+            .navigationSubtitle(yearSubtitle)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {

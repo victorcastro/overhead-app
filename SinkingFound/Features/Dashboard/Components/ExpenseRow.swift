@@ -10,14 +10,12 @@ struct ExpenseRow: View {
     private var expense: FixedExpense { occurrence.expense }
 
     private var subtitle: String {
-        var parts: [String] = [Self.leadingLabel(for: expense)]
-        let status = occurrence.isPaid
-            ? Self.paidDescription(occurrence.dueDate)
-            : Self.dueDescription(occurrence.dueDate)
-        parts.append(status)
+        var parts: [String] = [Self.cadenceLabel(for: expense)]
+        var status = occurrence.isPaid ? "Paid" : Self.dueDescription(occurrence.dueDate)
         if occurrence.isFinal {
-            parts.append("last payment")
+            status += " (last payment)"
         }
+        parts.append(status)
         if showsLocation, let name = Location.name(for: expense.location) {
             parts.append(name)
         }
@@ -66,10 +64,15 @@ struct ExpenseRow: View {
         .contentShape(Rectangle())
     }
 
-    private static func leadingLabel(for expense: FixedExpense) -> String {
+    private static func cadenceLabel(for expense: FixedExpense) -> String {
         switch expense.frequency {
-        case .annual, .oneTime: expense.frequency.label
-        case .monthly, .other: expense.category.label
+        case .monthly: expense.frequency.label
+        case .annual: expense.frequency.label
+        case .oneTime: expense.frequency.label
+        case .other:
+            expense.intervalMonths > 1
+                ? "Every \(expense.intervalMonths) months"
+                : ExpenseFrequency.monthly.label
         }
     }
 
@@ -83,9 +86,5 @@ struct ExpenseRow: View {
         case let value where value < 0: return "\(-value) \(-value == 1 ? "day" : "days") overdue"
         default: return "in \(days) days"
         }
-    }
-
-    static func paidDescription(_ dueDate: Date) -> String {
-        "Paid · " + dueDate.formatted(.dateTime.month(.abbreviated).day())
     }
 }
