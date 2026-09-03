@@ -21,9 +21,6 @@ concurrency:
   group: ios-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
-env:
-  DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
-
 jobs:
   version-and-changelog:
     name: Version and changelog

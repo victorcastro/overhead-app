@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct PaidSummaryCard: View {
+    @Environment(\.moneyFormat) private var money
+
     let paid: [ExpenseOccurrence]
     let base: Currency
     let showsLocation: Bool
@@ -27,7 +29,7 @@ struct PaidSummaryCard: View {
                             .lineLimit(1)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    Text(Money.string(total, currency: base))
+                    Text(money(total, base))
                         .font(.system(size: 15, weight: .medium))
                         .foregroundStyle(Theme.mutedText)
                     Image(systemName: "chevron.right")

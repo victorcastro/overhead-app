@@ -86,7 +86,8 @@ ahead. Marking as paid and editing stay on Home.
 
 ### Settings
 
-The Settings tab holds the base currency, the tracked locations, the reference exchange rates, and the iCloud controls.
+The Settings tab holds the base currency, the number of decimals shown on every amount, the tracked locations, the
+reference exchange rates, and the iCloud controls.
 Deleting a location moves the expenses that used it back to Undefined; with no locations defined, the dashboard filter
 and the expense form's location picker stay hidden.
 
@@ -160,9 +161,9 @@ SinkingFound/
 │   │   └── RootTabView.swift        # Home, Calendar, and Settings tabs
 │   └── Settings/
 │       ├── LocationSettingsView.swift
-│       └── SettingsView.swift       # iCloud, base currency, locations, exchange rates
+│       └── SettingsView.swift       # iCloud, base currency, decimals, locations, exchange rates
 ├── Models/
-│   ├── AppSettings.swift            # Base currency, locations, and the iCloud sync flag
+│   ├── AppSettings.swift            # Base currency, decimals, locations, and the iCloud sync flag
 │   ├── CloudDataEraser.swift        # Deletes this app's data from the private iCloud database
 │   ├── Currency.swift               # Currency metadata and money formatting
 │   ├── ExpenseAttributes.swift      # Frequency, category, and location types
@@ -184,7 +185,7 @@ SwiftUI views inside feature folders. This separation makes the financial rules 
 
 - Expense data is persisted locally using SwiftData.
 - iCloud sync is off by default and only runs when it is turned on in Settings. When enabled, the expenses go to the
-  user's private CloudKit database and the base currency and locations go to `NSUbiquitousKeyValueStore`; nothing leaves
+  user's private CloudKit database and the base currency, decimals, and locations go to `NSUbiquitousKeyValueStore`; nothing leaves
   the user's own iCloud account. Turning it off stops syncing without deleting anything on either side.
 - Settings has a separate, explicit action to delete this app's data from iCloud. It never runs as a side effect of
   turning sync off.

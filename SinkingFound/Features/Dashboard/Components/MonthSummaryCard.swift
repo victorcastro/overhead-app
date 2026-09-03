@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct MonthSummaryCard: View {
+    @Environment(\.moneyFormat) private var money
+
     let plan: MonthPlan
     let monthName: String
 
@@ -10,7 +12,7 @@ struct MonthSummaryCard: View {
                 .font(.system(size: 12))
                 .foregroundStyle(Theme.secondaryText)
 
-            Text(Money.string(plan.stillToSetAside, currency: plan.base))
+            Text(money(plan.stillToSetAside, plan.base))
                 .font(.system(size: 44, weight: .bold))
                 .kerning(-1)
                 .foregroundStyle(Theme.primaryText)
@@ -22,16 +24,16 @@ struct MonthSummaryCard: View {
                 .padding(.bottom, 8)
 
             HStack {
-                Text("\(Money.string(plan.paidTotal, currency: plan.base)) paid")
+                Text("\(money(plan.paidTotal, plan.base)) paid")
                 Spacer(minLength: 8)
-                Text("of \(Money.string(plan.total, currency: plan.base)) total")
+                Text("of \(money(plan.total, plan.base)) total")
             }
             .font(.system(size: 12))
             .foregroundStyle(Theme.secondaryText)
 
             Text(
-                "\(Money.string(plan.unpaidThisMonth, currency: plan.base)) unpaid this month + "
-                    + "\(Money.string(plan.annualShare, currency: plan.base)) share of annual"
+                "\(money(plan.unpaidThisMonth, plan.base)) unpaid this month + "
+                    + "\(money(plan.annualShare, plan.base)) share of annual"
             )
                 .font(.system(size: 12))
                 .foregroundStyle(Theme.secondaryText)
@@ -46,8 +48,8 @@ struct MonthSummaryCard: View {
     }
 
     private var accessibilitySummary: String {
-        "Still to set aside in \(monthName): \(Money.string(plan.stillToSetAside, currency: plan.base)). "
-            + "\(Money.string(plan.paidTotal, currency: plan.base)) paid "
-            + "of \(Money.string(plan.total, currency: plan.base))."
+        "Still to set aside in \(monthName): \(money(plan.stillToSetAside, plan.base)). "
+            + "\(money(plan.paidTotal, plan.base)) paid "
+            + "of \(money(plan.total, plan.base))."
     }
 }

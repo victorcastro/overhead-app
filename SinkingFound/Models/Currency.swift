@@ -52,7 +52,13 @@ enum Money {
         return formatter
     }()
 
-    static func string(_ value: Decimal, currency: Currency, decimals: Int = 0) -> String {
+    static func sample(decimals: Int) -> String {
+        formatter.minimumFractionDigits = decimals
+        formatter.maximumFractionDigits = decimals
+        return formatter.string(from: NSDecimalNumber(value: 1234.5678)) ?? "0"
+    }
+
+    static func string(_ value: Decimal, currency: Currency, decimals: Int) -> String {
         formatter.minimumFractionDigits = decimals
         formatter.maximumFractionDigits = decimals
         let digits = formatter.string(from: value as NSDecimalNumber) ?? "0"

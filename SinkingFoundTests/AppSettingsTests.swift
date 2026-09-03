@@ -8,6 +8,7 @@ private final class FakeKeyValueStore: KeyValueStore {
 
     func string(forKey key: String) -> String? { storage[key] as? String }
     func array(forKey key: String) -> [Any]? { storage[key] as? [Any] }
+    func object(forKey key: String) -> Any? { storage[key] }
     func set(_ value: Any?, forKey key: String) { storage[key] = value }
     func removeObject(forKey key: String) { storage.removeValue(forKey: key) }
 

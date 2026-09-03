@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct AnnualShareRow: View {
+    @Environment(\.moneyFormat) private var money
+
     let item: AnnualShareItem
     let showsLocation: Bool
 
@@ -32,10 +34,10 @@ struct AnnualShareRow: View {
             .frame(maxWidth: .infinity, alignment: .leading)
 
             VStack(alignment: .trailing, spacing: 2) {
-                Text("\(Money.string(item.monthlyShareInBase, currency: item.base)) / mo")
+                Text("\(money(item.monthlyShareInBase, item.base)) / mo")
                     .font(.system(size: 15, weight: .medium))
                     .foregroundStyle(Theme.primaryText)
-                Text("of \(Money.string(expense.amount(in: item.base), currency: item.base))")
+                Text("of \(money(expense.amount(in: item.base), item.base))")
                     .font(.system(size: 12))
                     .foregroundStyle(Theme.secondaryText)
             }

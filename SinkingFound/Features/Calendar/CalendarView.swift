@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct CalendarView: View {
+    @Environment(\.moneyFormat) private var money
     @Environment(AppSettings.self) private var settings
     @Query(sort: \FixedExpense.anchorDueDate) private var expenses: [FixedExpense]
 
@@ -83,7 +84,7 @@ struct CalendarView: View {
                     Text("Total fixed cost this year")
                         .font(.caption)
                         .foregroundStyle(Theme.secondaryText)
-                    Text(Money.string(summary.total, currency: base))
+                    Text(money(summary.total, base))
                         .font(.system(size: 34, weight: .bold))
                         .foregroundStyle(Theme.primaryText)
                 }
@@ -128,7 +129,7 @@ struct CalendarView: View {
 
             Spacer()
 
-            Text(Money.string(month.total, currency: base))
+            Text(money(month.total, base))
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(color)
                 .lineLimit(1)
@@ -180,7 +181,7 @@ struct CalendarView: View {
     private func monthAccessibilityLabel(_ month: AnnualMonthSummary, isCurrent: Bool) -> String {
         let date = month.date.formatted(.dateTime.month(.wide).year())
         let current = isCurrent ? ", current month" : ""
-        return "\(date), \(Money.string(month.total, currency: base)) in fixed expenses\(current)"
+        return "\(date), \(money(month.total, base)) in fixed expenses\(current)"
     }
 }
 

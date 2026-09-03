@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct MonthDetailSheet: View {
+    @Environment(\.moneyFormat) private var money
     @Environment(\.dismiss) private var dismiss
 
     let month: Date
@@ -83,7 +84,7 @@ struct MonthDetailSheet: View {
                 .font(.system(size: 12))
                 .foregroundStyle(Theme.secondaryText)
 
-            Text(Money.string(plan.dueThisMonth, currency: base))
+            Text(money(plan.dueThisMonth, base))
                 .font(.system(size: 44, weight: .bold))
                 .kerning(-1)
                 .foregroundStyle(Theme.primaryText)
@@ -91,7 +92,7 @@ struct MonthDetailSheet: View {
                 .minimumScaleFactor(0.6)
 
             if plan.annualShare > 0 {
-                Text("plus \(Money.string(plan.annualShare, currency: base)) share of annual expenses")
+                Text("plus \(money(plan.annualShare, base)) share of annual expenses")
                     .font(.system(size: 12))
                     .foregroundStyle(Theme.secondaryText)
                     .padding(.top, 6)
@@ -106,8 +107,8 @@ struct MonthDetailSheet: View {
     }
 
     private func accessibilitySummary(_ plan: MonthPlan) -> String {
-        let due = "\(monthAndYearTitle): \(Money.string(plan.dueThisMonth, currency: base)) in fixed expenses."
+        let due = "\(monthAndYearTitle): \(money(plan.dueThisMonth, base)) in fixed expenses."
         guard plan.annualShare > 0 else { return due }
-        return due + " Plus \(Money.string(plan.annualShare, currency: base)) share of annual expenses."
+        return due + " Plus \(money(plan.annualShare, base)) share of annual expenses."
     }
 }

@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct ExpenseFormView: View {
+    @Environment(\.moneyFormat) private var money
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Environment(AppSettings.self) private var settings
@@ -63,13 +64,13 @@ struct ExpenseFormView: View {
         let newTotal = baseTotal + draftContribution(amount: amount)
         let delta = newTotal - currentTotal
 
-        let newTotalText = Money.string(newTotal, currency: settings.baseCurrency)
+        let newTotalText = money(newTotal, settings.baseCurrency)
         if delta == 0 {
             return "\(monthName) total stays at \(newTotalText)."
         }
         let verb = delta > 0 ? "Adds" : "Removes"
         let direction = delta > 0 ? "to" : "from"
-        return "\(verb) \(Money.string(abs(delta), currency: settings.baseCurrency)) "
+        return "\(verb) \(money(abs(delta), settings.baseCurrency)) "
             + "\(direction) \(monthName) — new total \(newTotalText)."
     }
 

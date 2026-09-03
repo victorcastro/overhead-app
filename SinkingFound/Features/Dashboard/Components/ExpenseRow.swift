@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct ExpenseRow: View {
+    @Environment(\.moneyFormat) private var money
+
     let occurrence: ExpenseOccurrence
     let showsLocation: Bool
     var onTogglePaid: (() -> Void)?
@@ -49,11 +51,11 @@ struct ExpenseRow: View {
             .frame(maxWidth: .infinity, alignment: .leading)
 
             VStack(alignment: .trailing, spacing: 2) {
-                Text(Money.string(expense.amount, currency: expense.currency))
+                Text(money(expense.amount, expense.currency))
                     .font(.system(size: 15, weight: .medium))
                     .foregroundStyle(occurrence.isPaid ? Theme.mutedText : Theme.primaryText)
                 if expense.currency != occurrence.base {
-                    Text("≈ \(Money.string(occurrence.amountInBase, currency: occurrence.base))")
+                    Text("≈ \(money(occurrence.amountInBase, occurrence.base))")
                         .font(.system(size: 12))
                         .foregroundStyle(Theme.secondaryText)
                 }
