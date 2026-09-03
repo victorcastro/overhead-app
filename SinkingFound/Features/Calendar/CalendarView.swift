@@ -45,8 +45,6 @@ struct CalendarView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    yearHeader
-
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Total fixed cost this year")
                             .font(.caption)
@@ -74,7 +72,7 @@ struct CalendarView: View {
             }
             .background(Theme.background)
             .scrollIndicators(.hidden)
-            .navigationTitle("Annual calendar")
+            .navigationTitle(yearTitle)
             .navigationBarTitleDisplayMode(.inline)
             .sheet(item: $selectedMonth) { month in
                 MonthDetailSheet(
@@ -85,13 +83,6 @@ struct CalendarView: View {
                 )
             }
         }
-    }
-
-    private var yearHeader: some View {
-        Text(yearTitle)
-            .font(.title2.bold())
-            .foregroundStyle(Theme.primaryText)
-            .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func monthCard(_ month: AnnualMonthSummary) -> some View {
