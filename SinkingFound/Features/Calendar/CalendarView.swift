@@ -18,6 +18,10 @@ struct CalendarView: View {
         YearWindow.years(for: expenses, calendar: calendar)
     }
 
+    private var yearTitle: String {
+        displayedYear.formatted(.dateTime.year())
+    }
+
     private var isOnCurrentYear: Bool {
         calendar.isDate(displayedYear, equalTo: .now, toGranularity: .year)
     }
@@ -41,7 +45,7 @@ struct CalendarView: View {
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             .background(Theme.background)
-            .navigationTitle("Annual calendar")
+            .navigationTitle(yearTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 if !isOnCurrentYear {
@@ -75,11 +79,6 @@ struct CalendarView: View {
             let summary = summary(for: year)
 
             VStack(alignment: .leading, spacing: 20) {
-                Text(year.formatted(.dateTime.year()))
-                    .font(.title2.bold())
-                    .foregroundStyle(Theme.primaryText)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Total fixed cost this year")
                         .font(.caption)

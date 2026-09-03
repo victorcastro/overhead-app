@@ -71,15 +71,15 @@ current month.
 
 ### Annual calendar
 
-The Calendar tab shows one card per month of a year, whose number sits above the grid. It opens on the current year.
-Each card shows that month's fixed-cost total, a bar scaled against the year's heaviest month, and a color comparing
+The Calendar tab shows one card per month of a year, named in the navigation bar. It opens on the current year. Each
+card shows that month's fixed-cost total, a bar scaled against the year's heaviest month, and a color comparing
 it to the year's monthly average: normal up to 110%, above average up to 150%, heavy beyond that. It reads every
 expense, so the dashboard's location filter does not narrow these totals.
 
 Swiping left or right moves one year at a time. The range comes from the data: back to the oldest year holding a
 payment and forward to the last one, capped five years ahead so an expense without an end date does not open an endless
-range. Years with nothing in them sit inside that range and can still be swiped through, and a "This year" button
-appears in the navigation bar while the year on screen is not the current one.
+range. Years with nothing in them sit inside that range and can still be swiped through, and a "This year" button sits
+next to the title while the year on screen is not the current one.
 
 Tapping a card opens a read-only summary of that month: its total plus the expenses split into unpaid, paid and saving
 ahead. Marking as paid and editing stay on Home.
@@ -148,7 +148,7 @@ SinkingFound/
 │   └── Theme.swift                  # Shared colors, spacing, and card styling
 ├── Features/
 │   ├── Calendar/
-│   │   ├── CalendarView.swift       # Twelve-month expense overview
+│   │   ├── CalendarView.swift       # Twelve-month expense overview, one page per year
 │   │   └── MonthDetailSheet.swift   # Read-only breakdown of a single month
 │   ├── Dashboard/
 │   │   ├── DashboardComponents.swift

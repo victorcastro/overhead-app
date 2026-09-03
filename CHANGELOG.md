@@ -19,8 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the form on that same month, while the add button still anchors a new expense to the real current month.
 - Swipe between years in the Calendar tab, over a range the data decides: back to the oldest year that holds a payment
   and forward to the last one, capped at five years ahead so an expense that never ends does not open an endless range.
-  Years with nothing in them stay in the middle of the range and can be swiped through. A "This year" button appears in
-  the navigation bar whenever the year on screen is not the current one.
+  Years with nothing in them stay in the middle of the range and can be swiped through. The navigation bar carries the
+  year on screen instead of a fixed screen name, and a "This year" button appears there whenever it is not the current
+  one.
 - Month detail in the Calendar tab. Tapping a month card opens a read-only sheet with that month's fixed-cost total and
   its expenses split into unpaid, paid and saving ahead. Nothing can be changed from there.
 - An end rule for recurring expenses, set in the form: never, after a number of payments, or on a date. The count
