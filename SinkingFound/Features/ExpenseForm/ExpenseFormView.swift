@@ -2,6 +2,11 @@ import SwiftUI
 import SwiftData
 
 struct ExpenseFormView: View {
+    private enum Field {
+        case name
+        case amount
+    }
+
     @Environment(\.moneyFormat) private var money
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
@@ -24,6 +29,7 @@ struct ExpenseFormView: View {
     @State private var dueDate: Date
     @State private var isPaidThisCycle: Bool
     @State private var isConfirmingDelete = false
+    @FocusState private var focusedField: Field?
 
     private var isEditing: Bool { expense != nil }
     private var amount: Decimal? { Self.parseAmount(amountText) }
@@ -101,12 +107,16 @@ struct ExpenseFormView: View {
                     LabeledRow(label: "Name") {
                         TextField("Electricity", text: $name)
                             .foregroundStyle(Theme.primaryText)
+                            .focused($focusedField, equals: .name)
+                            .submitLabel(.next)
+                            .onSubmit { focusedField = .amount }
                     }
                     LabeledRow(label: "Amount") {
                         HStack(spacing: 8) {
                             TextField("0.00", text: $amountText)
                                 .keyboardType(.decimalPad)
                                 .foregroundStyle(Theme.primaryText)
+                                .focused($focusedField, equals: .amount)
                             Menu {
                                 Picker("Currency", selection: $currency) {
                                     ForEach(Currency.allCases) { Text($0.rawValue).tag($0) }
@@ -212,6 +222,8 @@ struct ExpenseFormView: View {
                 }
             }
             .scrollContentBackground(.hidden)
+            .scrollDismissesKeyboard(.interactively)
+            .simultaneousGesture(TapGesture().onEnded { focusedField = nil })
             .background(Theme.background)
             .navigationTitle(isEditing ? "Edit Expense" : "New Expense")
             .navigationBarTitleDisplayMode(.inline)
@@ -223,6 +235,10 @@ struct ExpenseFormView: View {
                     Button("Save") { save() }
                         .fontWeight(.semibold)
                         .disabled(!canSave)
+                }
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") { focusedField = nil }
                 }
             }
             .confirmationDialog(

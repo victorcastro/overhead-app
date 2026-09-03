@@ -49,6 +49,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   omitted the argument rounded to whole units. The argument is now required.
 - Editing an expense no longer truncates its amount to two decimals. The form filled its amount field with a rounded
   string, so saving after any edit wrote that rounded value back over the stored one.
+- The keyboard can be dismissed in the expense form. The amount field uses a decimal pad, which carries no return key,
+  so it stayed up with no way out. It now closes on a tap elsewhere in the form, on scroll, and with a Done button
+  above the keyboard, and the name field moves focus to the amount.
 
 ## [1.1.0] - 2026-09-03
 
