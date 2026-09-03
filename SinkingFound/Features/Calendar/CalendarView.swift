@@ -5,7 +5,7 @@ struct CalendarView: View {
     @Environment(AppSettings.self) private var settings
     @Query(sort: \FixedExpense.anchorDueDate) private var expenses: [FixedExpense]
 
-    @State private var displayedYear = Calendar.current.dateInterval(of: .year, for: .now)?.start ?? .now
+    private let displayedYear = Calendar.current.dateInterval(of: .year, for: .now)?.start ?? .now
 
     private let calendar = Calendar.current
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
@@ -73,27 +73,10 @@ struct CalendarView: View {
     }
 
     private var yearHeader: some View {
-        HStack {
-            Button {
-                moveYear(by: -1)
-            } label: {
-                Image(systemName: "chevron.left")
-                    .frame(width: 32, height: 32)
-            }
-            .accessibilityLabel("Previous year")
-
-            Text(yearTitle)
-                .font(.title2.bold())
-                .frame(maxWidth: .infinity)
-
-            Button {
-                moveYear(by: 1)
-            } label: {
-                Image(systemName: "chevron.right")
-                    .frame(width: 32, height: 32)
-            }
-            .accessibilityLabel("Next year")
-        }
+        Text(yearTitle)
+            .font(.title2.bold())
+            .foregroundStyle(Theme.primaryText)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func monthCard(_ month: AnnualMonthSummary) -> some View {
@@ -160,13 +143,6 @@ struct CalendarView: View {
                 .fill(color)
                 .frame(width: 8, height: 8)
             Text(title)
-        }
-    }
-
-    private func moveYear(by offset: Int) {
-        guard let year = calendar.date(byAdding: .year, value: offset, to: displayedYear) else { return }
-        withAnimation(.easeInOut(duration: 0.2)) {
-            displayedYear = year
         }
     }
 

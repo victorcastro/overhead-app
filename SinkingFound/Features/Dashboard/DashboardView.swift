@@ -1,14 +1,16 @@
 import SwiftUI
 import SwiftData
 
-enum ExpenseEditorTarget: Identifiable {
-    case new
-    case edit(FixedExpense)
+enum DashboardSheet: Identifiable {
+    case newExpense
+    case editExpense(FixedExpense)
+    case monthPicker
 
     var id: String {
         switch self {
-        case .new: "new"
-        case .edit(let expense): String(describing: expense.persistentModelID)
+        case .newExpense: "new"
+        case .editExpense(let expense): String(describing: expense.persistentModelID)
+        case .monthPicker: "monthPicker"
         }
     }
 }
@@ -20,7 +22,8 @@ struct DashboardView: View {
 
     @State private var filter: LocationFilter = .all
     @State private var isPaidExpanded = false
-    @State private var editorTarget: ExpenseEditorTarget?
+    @State private var activeSheet: DashboardSheet?
+    @State private var selectedMonth = Calendar.current.dateInterval(of: .month, for: .now)?.start ?? .now
 
     private let currentMonth = Calendar.current.dateInterval(of: .month, for: .now)?.start ?? .now
 
@@ -38,15 +41,15 @@ struct DashboardView: View {
     }
 
     private var plan: MonthPlan {
-        MonthPlan(expenses: visibleExpenses, month: currentMonth, base: settings.baseCurrency)
+        MonthPlan(expenses: visibleExpenses, month: selectedMonth, base: settings.baseCurrency)
     }
 
     private var monthTitle: String {
-        currentMonth.formatted(.dateTime.month(.wide))
+        selectedMonth.formatted(.dateTime.month(.wide))
     }
 
     private var monthAndYearTitle: String {
-        currentMonth.formatted(.dateTime.month(.wide).year())
+        selectedMonth.formatted(.dateTime.month(.wide).year())
     }
 
     var body: some View {
@@ -69,7 +72,7 @@ struct DashboardView: View {
                             ExpenseRow(occurrence: occurrence, showsLocation: showsLocation) {
                                 togglePaid(occurrence)
                             }
-                            .onTapGesture { editorTarget = .edit(occurrence.expense) }
+                            .onTapGesture { activeSheet = .editExpense(occurrence.expense) }
                         }
                         .padding(.bottom, 16)
                     }
@@ -81,7 +84,7 @@ struct DashboardView: View {
                             showsLocation: showsLocation,
                             isExpanded: $isPaidExpanded,
                             onTogglePaid: togglePaid,
-                            onSelect: { editorTarget = .edit($0.expense) }
+                            onSelect: { activeSheet = .editExpense($0.expense) }
                         )
                     }
 
@@ -89,7 +92,7 @@ struct DashboardView: View {
                         SectionHeader(title: "Saving ahead · \(plan.annualAhead.count)")
                         CardList(data: plan.annualAhead) { item in
                             AnnualShareRow(item: item, showsLocation: showsLocation)
-                                .onTapGesture { editorTarget = .edit(item.expense) }
+                                .onTapGesture { activeSheet = .editExpense(item.expense) }
                         }
                         .padding(.bottom, 16)
                     }
@@ -107,22 +110,36 @@ struct DashboardView: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle(monthAndYearTitle)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        activeSheet = .monthPicker
+                    } label: {
+                        Image(systemName: "calendar")
+                    }
+                    .accessibilityLabel("Choose month")
+                }
+
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        editorTarget = .new
+                        activeSheet = .newExpense
                     } label: {
                         Image(systemName: "plus")
                     }
                     .accessibilityLabel("Add fixed expense")
                 }
             }
-            .sheet(item: $editorTarget) { target in
-                switch target {
-                case .new:
+            .sheet(item: $activeSheet) { sheet in
+                switch sheet {
+                case .newExpense:
                     ExpenseFormView(expense: nil, month: currentMonth)
-                case .edit(let expense):
-                    ExpenseFormView(expense: expense, month: currentMonth)
+                case .editExpense(let expense):
+                    ExpenseFormView(expense: expense, month: selectedMonth)
+                case .monthPicker:
+                    MonthPickerSheet(selection: $selectedMonth)
                 }
+            }
+            .onChange(of: selectedMonth) {
+                isPaidExpanded = false
             }
             .onChange(of: settings.locationCodes) {
                 if case .code(let code) = filter, !settings.locationCodes.contains(code) {
@@ -134,7 +151,7 @@ struct DashboardView: View {
 
     private func togglePaid(_ occurrence: ExpenseOccurrence) {
         withAnimation(.easeInOut(duration: 0.2)) {
-            occurrence.expense.setPaid(!occurrence.isPaid, in: currentMonth)
+            occurrence.expense.setPaid(!occurrence.isPaid, in: selectedMonth)
         }
     }
 

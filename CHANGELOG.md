@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-09-03
+
+### Added
+
+- Month picker on Home, opened with the calendar button in the navigation bar. It shows the twelve months of a year in
+  a grid, marks the current and the selected one, and moves between years within a window of the current year plus or
+  minus one. A "This month" shortcut jumps back to today.
+- Home now reflects the selected month everywhere: the title, the summary card, the unpaid, paid and saving-ahead
+  sections, the empty state, and the paid toggle, which records the period you are looking at. Editing an expense opens
+  the form on that same month, while the add button still anchors a new expense to the real current month.
+
+### Removed
+
+- Year navigation in the Calendar tab. The chevrons beside the year are gone and the year is a fixed label, so the tab
+  always shows the twelve months of the current year.
+
 ## [1.1.0] - 2026-09-03
 
 ### Added

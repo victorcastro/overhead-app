@@ -50,21 +50,26 @@ connection. Syncing across devices is available through the user's own iCloud, a
 
 ### Monthly dashboard
 
-The Home tab calculates a plan for the current month and groups expenses into:
+The Home tab calculates a plan for the selected month and groups expenses into:
 
 | Section | Purpose |
 | --- | --- |
 | Still to set aside | Unpaid expenses plus the monthly share of future annual costs |
-| Unpaid | Expenses due during the current month that are not marked as paid |
+| Unpaid | Expenses due during the selected month that are not marked as paid |
 | Paid | Completed expenses for that monthly period |
 | Saving ahead | Monthly contributions toward annual expenses due later |
 
+It opens on the current month. The calendar button in the navigation bar opens a picker with the twelve months of a
+year, reachable from the current year minus one to the current year plus one, plus a shortcut back to this month.
+Marking an expense as paid records the month you are looking at, and adding a new expense always anchors it to the real
+current month.
+
 ### Annual calendar
 
-The Calendar tab shows one card per month of a year, navigable with the chevrons beside the year. Each card shows that
-month's fixed-cost total, a bar scaled against the year's heaviest month, and a color comparing it to the year's monthly
-average: normal up to 110%, above average up to 150%, heavy beyond that. It reads every expense, so the dashboard's
-location filter does not narrow these totals.
+The Calendar tab shows one card per month of the current year, whose number sits above the grid as a fixed label. Each
+card shows that month's fixed-cost total, a bar scaled against the year's heaviest month, and a color comparing it to
+the year's monthly average: normal up to 110%, above average up to 150%, heavy beyond that. It reads every expense, so
+the dashboard's location filter does not narrow these totals.
 
 ### Settings
 
@@ -133,7 +138,8 @@ SinkingFound/
 │   │   └── CalendarView.swift       # Twelve-month expense overview
 │   ├── Dashboard/
 │   │   ├── DashboardComponents.swift
-│   │   └── DashboardView.swift      # Home screen for the current month
+│   │   ├── DashboardView.swift      # Home screen for the selected month
+│   │   └── MonthPickerSheet.swift   # Month picker opened from the Home toolbar
 │   ├── ExpenseForm/
 │   │   └── ExpenseFormView.swift    # Create, edit, and delete expenses
 │   ├── Root/
