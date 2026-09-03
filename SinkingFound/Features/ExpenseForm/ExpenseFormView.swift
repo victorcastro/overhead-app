@@ -24,6 +24,55 @@ struct ExpenseFormView: View {
     @State private var isPaidThisCycle: Bool
     @State private var isConfirmingDelete = false
 
+    private var isEditing: Bool { expense != nil }
+    private var amount: Decimal? { Self.parseAmount(amountText) }
+    private var canSave: Bool { !name.trimmingCharacters(in: .whitespaces).isEmpty && (amount ?? 0) > 0 }
+    private var monthName: String { month.formatted(.dateTime.month(.wide)) }
+
+    private var sortedLocationCodes: [String] {
+        settings.locationCodes.sorted {
+            (Location.name(for: $0) ?? $0).localizedStandardCompare(Location.name(for: $1) ?? $1) == .orderedAscending
+        }
+    }
+
+    private var activeEndRule: ExpenseEndRule {
+        frequency == .oneTime ? .never : endRule
+    }
+
+    private var endSummary: String? {
+        switch endRule {
+        case .never:
+            return nil
+        case .onDate:
+            return "Nothing is due after \(endDate.formatted(.dateTime.month(.wide).day().year()))."
+        case .afterOccurrences:
+            guard let last = draft(amount: amount ?? 1).finalDueDate() else { return nil }
+            return "Counting the first one, the last payment falls on "
+                + "\(last.formatted(.dateTime.month(.wide).day().year()))."
+        }
+    }
+
+    private var impactSummary: String {
+        guard let amount, amount > 0 else {
+            return "Enter an amount to see how it changes \(monthName)."
+        }
+
+        let others = allExpenses.filter { $0 !== expense }
+        let currentTotal = MonthPlan(expenses: allExpenses, month: month, base: settings.baseCurrency).total
+        let baseTotal = MonthPlan(expenses: others, month: month, base: settings.baseCurrency).total
+        let newTotal = baseTotal + draftContribution(amount: amount)
+        let delta = newTotal - currentTotal
+
+        let newTotalText = Money.string(newTotal, currency: settings.baseCurrency)
+        if delta == 0 {
+            return "\(monthName) total stays at \(newTotalText)."
+        }
+        let verb = delta > 0 ? "Adds" : "Removes"
+        let direction = delta > 0 ? "to" : "from"
+        return "\(verb) \(Money.string(abs(delta), currency: settings.baseCurrency)) "
+            + "\(direction) \(monthName) — new total \(newTotalText)."
+    }
+
     init(expense: FixedExpense?, month: Date) {
         self.expense = expense
         self.month = month
@@ -42,17 +91,6 @@ struct ExpenseFormView: View {
         _location = State(initialValue: expense?.location ?? "")
         _dueDate = State(initialValue: expense?.dueDate(in: month) ?? expense?.anchorDueDate ?? month)
         _isPaidThisCycle = State(initialValue: expense?.isPaid(in: month) ?? false)
-    }
-
-    private var isEditing: Bool { expense != nil }
-    private var amount: Decimal? { Self.parseAmount(amountText) }
-    private var canSave: Bool { !name.trimmingCharacters(in: .whitespaces).isEmpty && (amount ?? 0) > 0 }
-    private var monthName: String { month.formatted(.dateTime.month(.wide)) }
-
-    private var sortedLocationCodes: [String] {
-        settings.locationCodes.sorted {
-            (Location.name(for: $0) ?? $0).localizedStandardCompare(Location.name(for: $1) ?? $1) == .orderedAscending
-        }
     }
 
     var body: some View {
@@ -206,38 +244,18 @@ struct ExpenseFormView: View {
         }
     }
 
-    private var endSummary: String? {
-        switch endRule {
-        case .never:
-            return nil
-        case .onDate:
-            return "Nothing is due after \(endDate.formatted(.dateTime.month(.wide).day().year()))."
-        case .afterOccurrences:
-            guard let last = draft(amount: amount ?? 1).finalDueDate() else { return nil }
-            return "Counting the first one, the last payment falls on "
-                + "\(last.formatted(.dateTime.month(.wide).day().year()))."
-        }
+    private static func parseAmount(_ text: String) -> Decimal? {
+        let normalized = text.replacingOccurrences(of: ",", with: ".")
+        guard !normalized.isEmpty else { return nil }
+        return Decimal(string: normalized, locale: Locale(identifier: "en_US"))
     }
 
-    private var impactSummary: String {
-        guard let amount, amount > 0 else {
-            return "Enter an amount to see how it changes \(monthName)."
-        }
-
-        let others = allExpenses.filter { $0 !== expense }
-        let currentTotal = MonthPlan(expenses: allExpenses, month: month, base: settings.baseCurrency).total
-        let baseTotal = MonthPlan(expenses: others, month: month, base: settings.baseCurrency).total
-        let newTotal = baseTotal + draftContribution(amount: amount)
-        let delta = newTotal - currentTotal
-
-        let newTotalText = Money.string(newTotal, currency: settings.baseCurrency)
-        if delta == 0 {
-            return "\(monthName) total stays at \(newTotalText)."
-        }
-        let verb = delta > 0 ? "Adds" : "Removes"
-        let direction = delta > 0 ? "to" : "from"
-        return "\(verb) \(Money.string(abs(delta), currency: settings.baseCurrency)) "
-            + "\(direction) \(monthName) — new total \(newTotalText)."
+    private static func editableAmount(_ value: Decimal) -> String {
+        var rounded = Decimal()
+        var source = value
+        NSDecimalRound(&rounded, &source, 0, .plain)
+        let digits = rounded == value ? 0 : 2
+        return String(format: "%.\(digits)f", (value as NSDecimalNumber).doubleValue)
     }
 
     private func draft(amount: Decimal) -> FixedExpense {
@@ -254,10 +272,6 @@ struct ExpenseFormView: View {
             endOccurrences: endOccurrences,
             endDate: activeEndRule == .onDate ? endDate : nil
         )
-    }
-
-    private var activeEndRule: ExpenseEndRule {
-        frequency == .oneTime ? .never : endRule
     }
 
     private func draftContribution(amount: Decimal) -> Decimal {
@@ -299,20 +313,6 @@ struct ExpenseFormView: View {
             modelContext.delete(expense)
         }
         dismiss()
-    }
-
-    private static func parseAmount(_ text: String) -> Decimal? {
-        let normalized = text.replacingOccurrences(of: ",", with: ".")
-        guard !normalized.isEmpty else { return nil }
-        return Decimal(string: normalized, locale: Locale(identifier: "en_US"))
-    }
-
-    private static func editableAmount(_ value: Decimal) -> String {
-        var rounded = Decimal()
-        var source = value
-        NSDecimalRound(&rounded, &source, 0, .plain)
-        let digits = rounded == value ? 0 : 2
-        return String(format: "%.\(digits)f", (value as NSDecimalNumber).doubleValue)
     }
 }
 

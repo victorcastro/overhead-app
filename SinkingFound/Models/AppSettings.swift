@@ -3,6 +3,10 @@ import Observation
 
 @Observable
 final class AppSettings {
+    static let baseCurrencyKey = "baseCurrency"
+    static let locationCodesKey = "locationCodes"
+    private static let iCloudSyncEnabledKey = "iCloudSyncEnabled"
+
     var baseCurrency: Currency {
         didSet {
             defaults.set(baseCurrency.rawValue, forKey: Self.baseCurrencyKey)
@@ -31,10 +35,6 @@ final class AppSettings {
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let ubiquitous: KeyValueStore
     @ObservationIgnored private var externalChangeObserver: (any NSObjectProtocol)?
-
-    static let baseCurrencyKey = "baseCurrency"
-    static let locationCodesKey = "locationCodes"
-    private static let iCloudSyncEnabledKey = "iCloudSyncEnabled"
 
     init(
         defaults: UserDefaults = .standard,
@@ -66,15 +66,15 @@ final class AppSettings {
         }
     }
 
-    private func mirrorToCloud(_ value: Any, forKey key: String) {
-        guard iCloudSyncEnabled else { return }
-        ubiquitous.set(value, forKey: key)
-        ubiquitous.synchronize()
-    }
-
     func clearCloudMirror() {
         ubiquitous.removeObject(forKey: Self.baseCurrencyKey)
         ubiquitous.removeObject(forKey: Self.locationCodesKey)
+        ubiquitous.synchronize()
+    }
+
+    private func mirrorToCloud(_ value: Any, forKey key: String) {
+        guard iCloudSyncEnabled else { return }
+        ubiquitous.set(value, forKey: key)
         ubiquitous.synchronize()
     }
 
