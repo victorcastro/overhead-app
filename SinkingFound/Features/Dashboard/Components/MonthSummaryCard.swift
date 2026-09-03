@@ -8,11 +8,11 @@ struct MonthSummaryCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("Still to set aside")
+            Text("Left to pay this month")
                 .font(.system(size: 12))
                 .foregroundStyle(Theme.secondaryText)
 
-            Text(money(plan.stillToSetAside, plan.base))
+            Text(money(plan.leftToPayThisMonth, plan.base))
                 .font(.system(size: 44, weight: .bold))
                 .kerning(-1)
                 .foregroundStyle(Theme.primaryText)
@@ -30,14 +30,6 @@ struct MonthSummaryCard: View {
             }
             .font(.system(size: 12))
             .foregroundStyle(Theme.secondaryText)
-
-            Text(
-                "\(money(plan.unpaidThisMonth, plan.base)) unpaid this month + "
-                    + "\(money(plan.annualShare, plan.base)) share of annual"
-            )
-                .font(.system(size: 12))
-                .foregroundStyle(Theme.secondaryText)
-                .padding(.top, 6)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 18)
@@ -48,7 +40,7 @@ struct MonthSummaryCard: View {
     }
 
     private var accessibilitySummary: String {
-        "Still to set aside in \(monthName): \(money(plan.stillToSetAside, plan.base)). "
+        "Left to pay in \(monthName): \(money(plan.leftToPayThisMonth, plan.base)). "
             + "\(money(plan.paidTotal, plan.base)) paid "
             + "of \(money(plan.total, plan.base))."
     }

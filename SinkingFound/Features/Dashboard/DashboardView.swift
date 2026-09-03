@@ -155,15 +155,6 @@ struct DashboardView: View {
                 .padding(.bottom, 16)
             }
 
-            if !plan.annualAhead.isEmpty {
-                SectionHeader(title: "Saving ahead · \(plan.annualAhead.count)")
-                CardList(data: plan.annualAhead) { item in
-                    AnnualShareRow(item: item, showsLocation: showsLocation)
-                        .onTapGesture { activeSheet = .editExpense(item.expense) }
-                }
-                .padding(.bottom, 16)
-            }
-
             if !plan.paid.isEmpty {
                 PaidSummaryCard(
                     paid: plan.paid,
@@ -175,7 +166,7 @@ struct DashboardView: View {
                 )
             }
 
-            if plan.occurrences.isEmpty && plan.annualAhead.isEmpty {
+            if plan.occurrences.isEmpty {
                 EmptyMonthView(monthTitle: monthTitle(for: month))
                     .padding(.top, 24)
             }

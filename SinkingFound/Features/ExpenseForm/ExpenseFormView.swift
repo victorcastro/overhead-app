@@ -278,10 +278,7 @@ struct ExpenseFormView: View {
 
     private func draftContribution(amount: Decimal) -> Decimal {
         let draft = draft(amount: amount)
-        if draft.dueDate(in: month) != nil {
-            return draft.amount(in: settings.baseCurrency)
-        }
-        return frequency == .annual ? draft.amount(in: settings.baseCurrency) / 12 : 0
+        return draft.dueDate(in: month) != nil ? draft.amount(in: settings.baseCurrency) : 0
     }
 
     private func save() {

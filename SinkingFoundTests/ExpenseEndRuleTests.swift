@@ -101,7 +101,7 @@ struct ExpenseEndRuleTests {
         #expect(expense.finalDueDate() == nil)
     }
 
-    @Test func endedAnnualExpenseLeavesSavingAhead() {
+    @Test func endedAnnualExpenseIsDueOnceThenStops() {
         let expense = makeExpense(
             amount: 1200,
             frequency: .annual,
@@ -111,12 +111,15 @@ struct ExpenseEndRuleTests {
         )
 
         let beforeTheOnlyDueDate = MonthPlan(expenses: [expense], month: date(2026, 5, 1), base: .usd)
-        #expect(beforeTheOnlyDueDate.annualAhead.count == 1)
-        #expect(beforeTheOnlyDueDate.annualShare == 100)
+        #expect(beforeTheOnlyDueDate.occurrences.isEmpty)
+        #expect(beforeTheOnlyDueDate.total == 0)
 
-        let afterTheOnlyDueDate = MonthPlan(expenses: [expense], month: date(2026, 11, 1), base: .usd)
-        #expect(afterTheOnlyDueDate.annualAhead.isEmpty)
-        #expect(afterTheOnlyDueDate.annualShare == 0)
+        let theOnlyDueDate = MonthPlan(expenses: [expense], month: date(2026, 9, 1), base: .usd)
+        #expect(theOnlyDueDate.occurrences.count == 1)
+        #expect(theOnlyDueDate.dueThisMonth == 1200)
+
+        let afterTheOnlyDueDate = MonthPlan(expenses: [expense], month: date(2027, 9, 1), base: .usd)
+        #expect(afterTheOnlyDueDate.occurrences.isEmpty)
         #expect(afterTheOnlyDueDate.total == 0)
     }
 

@@ -41,7 +41,6 @@ struct MonthPlanTests {
         let plan = MonthPlan(expenses: [expense], month: date(2025, 12, 1), base: .usd)
 
         #expect(plan.occurrences.isEmpty)
-        #expect(plan.annualAhead.isEmpty)
         #expect(plan.dueThisMonth == 0)
     }
 
@@ -59,19 +58,20 @@ struct MonthPlanTests {
         #expect(june.unpaidThisMonth == 100)
     }
 
-    @Test func annualExpenseIsSavedAheadOutsideItsDueMonth() {
+    @Test func annualExpenseIsDueOnlyInItsAnchorMonth() {
         let expense = makeExpense(amount: 1200, frequency: .annual, anchor: date(2026, 9, 15))
 
         let may = MonthPlan(expenses: [expense], month: date(2026, 5, 1), base: .usd)
         #expect(may.occurrences.isEmpty)
-        #expect(may.annualAhead.count == 1)
-        #expect(may.annualAhead.first?.dueDate == date(2026, 9, 15))
-        #expect(may.annualShare == 100)
-        #expect(may.total == 100)
+        #expect(may.total == 0)
 
         let september = MonthPlan(expenses: [expense], month: date(2026, 9, 1), base: .usd)
         #expect(september.occurrences.count == 1)
-        #expect(september.annualAhead.isEmpty)
+        #expect(september.occurrences.first?.dueDate == date(2026, 9, 15))
         #expect(september.dueThisMonth == 1200)
+
+        let nextSeptember = MonthPlan(expenses: [expense], month: date(2027, 9, 1), base: .usd)
+        #expect(nextSeptember.occurrences.count == 1)
+        #expect(nextSeptember.occurrences.first?.dueDate == date(2027, 9, 15))
     }
 }

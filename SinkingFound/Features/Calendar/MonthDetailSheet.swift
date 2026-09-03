@@ -46,15 +46,7 @@ struct MonthDetailSheet: View {
                         .padding(.bottom, 16)
                     }
 
-                    if !plan.annualAhead.isEmpty {
-                        SectionHeader(title: "Saving ahead · \(plan.annualAhead.count)")
-                        CardList(data: plan.annualAhead) { item in
-                            AnnualShareRow(item: item, showsLocation: showsLocation)
-                        }
-                        .padding(.bottom, 16)
-                    }
-
-                    if plan.occurrences.isEmpty && plan.annualAhead.isEmpty {
+                    if plan.occurrences.isEmpty {
                         EmptyMonthView(monthTitle: monthTitle)
                             .padding(.top, 24)
                     }
@@ -91,12 +83,6 @@ struct MonthDetailSheet: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
 
-            if plan.annualShare > 0 {
-                Text("plus \(money(plan.annualShare, base)) share of annual expenses")
-                    .font(.system(size: 12))
-                    .foregroundStyle(Theme.secondaryText)
-                    .padding(.top, 6)
-            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 18)
@@ -107,8 +93,6 @@ struct MonthDetailSheet: View {
     }
 
     private func accessibilitySummary(_ plan: MonthPlan) -> String {
-        let due = "\(monthAndYearTitle): \(money(plan.dueThisMonth, base)) in fixed expenses."
-        guard plan.annualShare > 0 else { return due }
-        return due + " Plus \(money(plan.annualShare, base)) share of annual expenses."
+        "\(monthAndYearTitle): \(money(plan.dueThisMonth, base)) in fixed expenses."
     }
 }
