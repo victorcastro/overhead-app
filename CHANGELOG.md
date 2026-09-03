@@ -35,8 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Home groups the expenses due this month by category, one section per category in the order the category list
-  defines, instead of a single Unpaid list. The paid card moved below the saving-ahead section, at the end of the
-  month, and keeps its collapsed-by-default toggle.
+  defines, instead of a single Unpaid list. Each header carries that category's total in the base currency. The paid
+  card moved below the saving-ahead section, at the end of the month, and keeps its collapsed-by-default toggle.
 - Minimum deployment target raised to iOS 26.0 for every target, including the project-level build configurations.
   Xcode 26 is now required to build, and CI runs on the `macos-26` runner against an iPhone 17 simulator.
 - Test targets now match the app target's `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`.

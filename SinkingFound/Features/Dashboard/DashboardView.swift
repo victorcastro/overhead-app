@@ -16,6 +16,7 @@ enum DashboardSheet: Identifiable {
 }
 
 struct DashboardView: View {
+    @Environment(\.moneyFormat) private var money
     @Environment(AppSettings.self) private var settings
     @Query(sort: \FixedExpense.anchorDueDate) private var expenses: [FixedExpense]
 
@@ -128,7 +129,7 @@ struct DashboardView: View {
             }
 
             ForEach(plan.unpaidByCategory) { group in
-                SectionHeader(title: "\(group.category.label) · \(group.occurrences.count)")
+                SectionHeader(title: "\(group.category.label) · \(money(group.total, plan.base))")
                 CardList(data: group.occurrences) { occurrence in
                     ExpenseRow(occurrence: occurrence, showsLocation: showsLocation) {
                         togglePaid(occurrence, in: month)
