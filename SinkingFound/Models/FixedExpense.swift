@@ -11,6 +11,9 @@ final class FixedExpense {
     var location: String = ""
     var anchorDueDate: Date = Date.now
     var intervalMonths: Int = 1
+    var endRule: ExpenseEndRule = ExpenseEndRule.never
+    var endOccurrences: Int = 12
+    var endDate: Date?
     var paidPeriods: [String] = []
     var createdAt: Date = Date.now
 
@@ -23,6 +26,9 @@ final class FixedExpense {
         location: String = "",
         anchorDueDate: Date,
         intervalMonths: Int = 1,
+        endRule: ExpenseEndRule = .never,
+        endOccurrences: Int = 12,
+        endDate: Date? = nil,
         paidPeriods: [String] = [],
         createdAt: Date = .now
     ) {
@@ -34,6 +40,9 @@ final class FixedExpense {
         self.location = location
         self.anchorDueDate = anchorDueDate
         self.intervalMonths = intervalMonths
+        self.endRule = endRule
+        self.endOccurrences = endOccurrences
+        self.endDate = endDate
         self.paidPeriods = paidPeriods
         self.createdAt = createdAt
     }
@@ -64,7 +73,63 @@ final class FixedExpense {
 
         guard let daysInMonth = calendar.range(of: .day, in: .month, for: monthStart)?.count else { return nil }
         let day = min(anchor.day ?? 1, daysInMonth)
-        return calendar.date(from: DateComponents(year: target.year, month: target.month, day: day))
+        guard let date = calendar.date(from: DateComponents(year: target.year, month: target.month, day: day)),
+              allowsOccurrence(on: date, calendar: calendar)
+        else { return nil }
+        return date
+    }
+
+    var stepMonths: Int {
+        switch frequency {
+        case .monthly, .oneTime: 1
+        case .annual: 12
+        case .other: max(intervalMonths, 1)
+        }
+    }
+
+    func allowsOccurrence(on date: Date, calendar: Calendar = .current) -> Bool {
+        guard frequency != .oneTime else { return true }
+
+        switch endRule {
+        case .never:
+            return true
+        case .onDate:
+            guard let endDate else { return true }
+            return calendar.startOfDay(for: date) <= calendar.startOfDay(for: endDate)
+        case .afterOccurrences:
+            guard let index = occurrenceIndex(on: date, calendar: calendar) else { return true }
+            return index <= max(endOccurrences, 1)
+        }
+    }
+
+    func occurrenceIndex(on date: Date, calendar: Calendar = .current) -> Int? {
+        guard let monthStart = calendar.dateInterval(of: .month, for: date)?.start,
+              let anchorMonthStart = calendar.dateInterval(of: .month, for: anchorDueDate)?.start,
+              let elapsed = calendar.dateComponents([.month], from: anchorMonthStart, to: monthStart).month,
+              elapsed >= 0
+        else { return nil }
+        return elapsed / stepMonths + 1
+    }
+
+    func isFinalOccurrence(in month: Date, calendar: Calendar = .current) -> Bool {
+        guard frequency != .oneTime, endRule != .never,
+              dueDate(in: month, calendar: calendar) != nil,
+              let monthStart = calendar.dateInterval(of: .month, for: month)?.start,
+              let next = calendar.date(byAdding: .month, value: stepMonths, to: monthStart)
+        else { return false }
+        return dueDate(in: next, calendar: calendar) == nil
+    }
+
+    func finalDueDate(calendar: Calendar = .current) -> Date? {
+        guard frequency != .oneTime, endRule == .afterOccurrences,
+              let anchorMonthStart = calendar.dateInterval(of: .month, for: anchorDueDate)?.start,
+              let month = calendar.date(
+                  byAdding: .month,
+                  value: (max(endOccurrences, 1) - 1) * stepMonths,
+                  to: anchorMonthStart
+              )
+        else { return nil }
+        return dueDate(in: month, calendar: calendar)
     }
 
     func isPaid(in month: Date) -> Bool {

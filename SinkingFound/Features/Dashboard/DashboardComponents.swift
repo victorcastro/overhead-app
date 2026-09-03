@@ -115,6 +115,9 @@ struct ExpenseRow: View {
             ? Self.paidDescription(occurrence.dueDate)
             : Self.dueDescription(occurrence.dueDate)
         parts.append(status)
+        if occurrence.isFinal {
+            parts.append("last payment")
+        }
         if showsLocation, let name = Location.name(for: expense.location) {
             parts.append(name)
         }

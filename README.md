@@ -59,6 +59,10 @@ The Home tab calculates a plan for the selected month and groups expenses into:
 | Paid | Completed expenses for that monthly period |
 | Saving ahead | Monthly contributions toward annual expenses due later |
 
+A recurring expense can end: never, after a number of payments counting the first one, or on a date it may not fall
+past. One-time expenses have no end rule. A series that has ended disappears from later months, from the annual totals
+and from the share saved ahead, and its final payment reads "last payment" in the list.
+
 It opens on the current month. The calendar button in the navigation bar opens a picker with the twelve months of a
 year, reachable from the current year minus one to the current year plus one, plus a shortcut back to this month.
 Marking an expense as paid records the month you are looking at, and adding a new expense always anchors it to the real

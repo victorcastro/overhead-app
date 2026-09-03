@@ -5,6 +5,7 @@ struct ExpenseOccurrence: Identifiable {
     let expense: FixedExpense
     let dueDate: Date
     let isPaid: Bool
+    let isFinal: Bool
     let base: Currency
 
     var id: PersistentIdentifier { expense.persistentModelID }
@@ -41,11 +42,12 @@ struct MonthPlan {
                         expense: expense,
                         dueDate: dueDate,
                         isPaid: expense.isPaid(in: month),
+                        isFinal: expense.isFinalOccurrence(in: month, calendar: calendar),
                         base: base
                     )
                 )
-            } else if expense.frequency == .annual {
-                let next = Self.nextAnnualDueDate(for: expense, after: monthStart, calendar: calendar)
+            } else if expense.frequency == .annual,
+                      let next = Self.nextAnnualDueDate(for: expense, after: monthStart, calendar: calendar) {
                 annualAhead.append(AnnualShareItem(expense: expense, dueDate: next, base: base))
             }
         }
@@ -58,17 +60,17 @@ struct MonthPlan {
         for expense: FixedExpense,
         after monthStart: Date,
         calendar: Calendar
-    ) -> Date {
+    ) -> Date? {
         let anchor = calendar.dateComponents([.month, .day], from: expense.anchorDueDate)
         let year = calendar.component(.year, from: monthStart)
         for candidateYear in [year, year + 1] {
             let components = DateComponents(year: candidateYear, month: anchor.month, day: anchor.day)
             if let date = calendar.date(from: components),
                date >= monthStart {
-                return date
+                return expense.allowsOccurrence(on: date, calendar: calendar) ? date : nil
             }
         }
-        return expense.anchorDueDate
+        return expense.allowsOccurrence(on: expense.anchorDueDate, calendar: calendar) ? expense.anchorDueDate : nil
     }
 
     var annualShare: Decimal { annualAhead.reduce(0) { $0 + $1.monthlyShareInBase } }

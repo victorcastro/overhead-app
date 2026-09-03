@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the form on that same month, while the add button still anchors a new expense to the real current month.
 - Month detail in the Calendar tab. Tapping a month card opens a read-only sheet with that month's fixed-cost total and
   its expenses split into unpaid, paid and saving ahead. Nothing can be changed from there.
+- An end rule for recurring expenses, set in the form: never, after a number of payments, or on a date. The count
+  includes the first payment, and the date is the last day an expense may fall on. One-time expenses do not offer it.
+  Once a series ends it stops appearing in the month, in the annual totals and in the share of annual expenses saved
+  ahead, and its final payment is labelled "last payment" in the list.
 
 ### Removed
 

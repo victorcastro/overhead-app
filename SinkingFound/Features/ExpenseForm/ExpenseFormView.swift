@@ -15,6 +15,9 @@ struct ExpenseFormView: View {
     @State private var currency: Currency
     @State private var frequency: ExpenseFrequency
     @State private var intervalMonths: Int
+    @State private var endRule: ExpenseEndRule
+    @State private var endOccurrences: Int
+    @State private var endDate: Date
     @State private var category: ExpenseCategory
     @State private var location: String
     @State private var dueDate: Date
@@ -29,6 +32,12 @@ struct ExpenseFormView: View {
         _currency = State(initialValue: expense?.currency ?? .usd)
         _frequency = State(initialValue: expense?.frequency ?? .monthly)
         _intervalMonths = State(initialValue: expense?.intervalMonths ?? 3)
+        _endRule = State(initialValue: expense?.endRule ?? .never)
+        _endOccurrences = State(initialValue: expense?.endOccurrences ?? 12)
+        let anchor = expense?.anchorDueDate ?? month
+        _endDate = State(
+            initialValue: expense?.endDate ?? Calendar.current.date(byAdding: .year, value: 1, to: anchor) ?? anchor
+        )
         _category = State(initialValue: expense?.category ?? .utilities)
         _location = State(initialValue: expense?.location ?? "")
         _dueDate = State(initialValue: expense?.dueDate(in: month) ?? expense?.anchorDueDate ?? month)
@@ -90,6 +99,35 @@ struct ExpenseFormView: View {
                     }
                 } header: {
                     Text("Frequency")
+                }
+
+                if frequency != .oneTime {
+                    Section {
+                        Picker("Ends", selection: $endRule) {
+                            ForEach(ExpenseEndRule.allCases) { Text($0.label).tag($0) }
+                        }
+                        .pickerStyle(.segmented)
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+
+                        if endRule == .afterOccurrences {
+                            Stepper("Repetitions: \(endOccurrences)", value: $endOccurrences, in: 1...240)
+                                .listRowBackground(Theme.card)
+                        }
+
+                        if endRule == .onDate {
+                            DatePicker("Last due date", selection: $endDate, displayedComponents: .date)
+                                .listRowBackground(Theme.card)
+                        }
+                    } header: {
+                        Text("Ends")
+                    } footer: {
+                        if let endSummary {
+                            Text(endSummary)
+                                .font(.system(size: 12))
+                                .foregroundStyle(Theme.secondaryText)
+                        }
+                    }
                 }
 
                 Section {
@@ -168,6 +206,19 @@ struct ExpenseFormView: View {
         }
     }
 
+    private var endSummary: String? {
+        switch endRule {
+        case .never:
+            return nil
+        case .onDate:
+            return "Nothing is due after \(endDate.formatted(.dateTime.month(.wide).day().year()))."
+        case .afterOccurrences:
+            guard let last = draft(amount: amount ?? 1).finalDueDate() else { return nil }
+            return "Counting the first one, the last payment falls on "
+                + "\(last.formatted(.dateTime.month(.wide).day().year()))."
+        }
+    }
+
     private var impactSummary: String {
         guard let amount, amount > 0 else {
             return "Enter an amount to see how it changes \(monthName)."
@@ -189,8 +240,8 @@ struct ExpenseFormView: View {
             + "\(direction) \(monthName) — new total \(newTotalText)."
     }
 
-    private func draftContribution(amount: Decimal) -> Decimal {
-        let draft = FixedExpense(
+    private func draft(amount: Decimal) -> FixedExpense {
+        FixedExpense(
             name: name,
             amount: amount,
             currency: currency,
@@ -198,8 +249,19 @@ struct ExpenseFormView: View {
             category: category,
             location: location,
             anchorDueDate: dueDate,
-            intervalMonths: intervalMonths
+            intervalMonths: intervalMonths,
+            endRule: activeEndRule,
+            endOccurrences: endOccurrences,
+            endDate: activeEndRule == .onDate ? endDate : nil
         )
+    }
+
+    private var activeEndRule: ExpenseEndRule {
+        frequency == .oneTime ? .never : endRule
+    }
+
+    private func draftContribution(amount: Decimal) -> Decimal {
+        let draft = draft(amount: amount)
         if draft.dueDate(in: month) != nil {
             return draft.amount(in: settings.baseCurrency)
         }
@@ -221,6 +283,9 @@ struct ExpenseFormView: View {
         target.currency = currency
         target.frequency = frequency
         target.intervalMonths = intervalMonths
+        target.endRule = activeEndRule
+        target.endOccurrences = endOccurrences
+        target.endDate = activeEndRule == .onDate ? endDate : nil
         target.category = category
         target.location = location
         target.anchorDueDate = dueDate
