@@ -2,6 +2,8 @@ import SwiftUI
 import SwiftData
 
 struct CalendarView: View {
+    let resetToken: Int
+
     @Environment(\.moneyFormat) private var money
     @Environment(AppSettings.self) private var settings
     @Query(sort: \FixedExpense.anchorDueDate) private var expenses: [FixedExpense]
@@ -71,6 +73,12 @@ struct CalendarView: View {
             .onChange(of: availableYears) { _, years in
                 guard !years.contains(displayedYear) else { return }
                 displayedYear = years.contains(currentYear) ? currentYear : (years.first ?? currentYear)
+            }
+            .onChange(of: resetToken) { _, _ in
+                guard !isOnCurrentYear else { return }
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    displayedYear = currentYear
+                }
             }
         }
     }

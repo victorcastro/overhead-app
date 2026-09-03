@@ -16,6 +16,8 @@ enum DashboardSheet: Identifiable {
 }
 
 struct DashboardView: View {
+    let resetToken: Int
+
     @Environment(\.moneyFormat) private var money
     @Environment(AppSettings.self) private var settings
     @Query(sort: \FixedExpense.anchorDueDate) private var expenses: [FixedExpense]
@@ -29,6 +31,7 @@ struct DashboardView: View {
     private let availableMonths = MonthWindow.months()
 
     private var activeFilter: LocationFilter {
+        guard settings.hasMultipleLocations else { return .all }
         if case .code(let code) = filter, !settings.locationCodes.contains(code) { return .all }
         return filter
     }
@@ -38,7 +41,7 @@ struct DashboardView: View {
     }
 
     private var showsLocation: Bool {
-        settings.hasLocations && activeFilter == .all
+        settings.hasMultipleLocations && activeFilter == .all
     }
 
     private func plan(for month: Date) -> MonthPlan {
@@ -98,8 +101,16 @@ struct DashboardView: View {
                 isPaidExpanded = false
             }
             .onChange(of: settings.locationCodes) {
-                if case .code(let code) = filter, !settings.locationCodes.contains(code) {
+                if !settings.hasMultipleLocations {
                     filter = .all
+                } else if case .code(let code) = filter, !settings.locationCodes.contains(code) {
+                    filter = .all
+                }
+            }
+            .onChange(of: resetToken) { _, _ in
+                guard selectedMonth != currentMonth else { return }
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    selectedMonth = currentMonth
                 }
             }
         }
@@ -123,7 +134,7 @@ struct DashboardView: View {
             MonthSummaryCard(plan: plan, monthName: monthTitle(for: month))
                 .padding(.bottom, 16)
 
-            if settings.hasLocations {
+            if settings.hasMultipleLocations {
                 LocationFilterPills(codes: settings.locationCodes, selection: $filter)
                     .padding(.bottom, 16)
             }

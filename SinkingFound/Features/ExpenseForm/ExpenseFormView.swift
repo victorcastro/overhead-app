@@ -244,6 +244,9 @@ struct ExpenseFormView: View {
             if !location.isEmpty, !settings.locationCodes.contains(location) {
                 location = ""
             }
+            if !isEditing, location.isEmpty, settings.locationCodes.count == 1 {
+                location = settings.locationCodes[0]
+            }
         }
     }
 

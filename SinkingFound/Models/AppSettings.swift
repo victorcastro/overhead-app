@@ -44,6 +44,7 @@ final class AppSettings {
     }
 
     var hasLocations: Bool { !locationCodes.isEmpty }
+    var hasMultipleLocations: Bool { locationCodes.count > 1 }
 
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let ubiquitous: KeyValueStore
