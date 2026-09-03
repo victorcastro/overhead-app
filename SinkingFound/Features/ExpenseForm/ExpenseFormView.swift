@@ -244,8 +244,11 @@ struct ExpenseFormView: View {
             if !location.isEmpty, !settings.locationCodes.contains(location) {
                 location = ""
             }
-            if !isEditing, location.isEmpty, settings.locationCodes.count == 1 {
-                location = settings.locationCodes[0]
+            if !isEditing {
+                currency = settings.baseCurrency
+                if location.isEmpty, settings.locationCodes.count == 1 {
+                    location = settings.locationCodes[0]
+                }
             }
         }
     }
