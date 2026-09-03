@@ -5,6 +5,8 @@ struct CalendarView: View {
     @Environment(AppSettings.self) private var settings
     @Query(sort: \FixedExpense.anchorDueDate) private var expenses: [FixedExpense]
 
+    @State private var selectedMonth: AnnualMonthSummary?
+
     private let displayedYear = Calendar.current.dateInterval(of: .year, for: .now)?.start ?? .now
 
     private let calendar = Calendar.current
@@ -56,7 +58,12 @@ struct CalendarView: View {
 
                     LazyVGrid(columns: columns, spacing: 10) {
                         ForEach(months) { month in
-                            monthCard(month)
+                            Button {
+                                selectedMonth = month
+                            } label: {
+                                monthCard(month)
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
 
@@ -69,6 +76,14 @@ struct CalendarView: View {
             .scrollIndicators(.hidden)
             .navigationTitle("Annual calendar")
             .navigationBarTitleDisplayMode(.inline)
+            .sheet(item: $selectedMonth) { month in
+                MonthDetailSheet(
+                    month: month.date,
+                    expenses: expenses,
+                    base: base,
+                    showsLocation: settings.hasLocations
+                )
+            }
         }
     }
 
@@ -123,8 +138,10 @@ struct CalendarView: View {
             RoundedRectangle(cornerRadius: 13, style: .continuous)
                 .stroke(isCurrent ? Theme.positive : Theme.separator, lineWidth: 1)
         }
+        .contentShape(Rectangle())
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(monthAccessibilityLabel(month, isCurrent: isCurrent))
+        .accessibilityHint("Shows this month's expenses")
     }
 
     private var calendarLegend: some View {

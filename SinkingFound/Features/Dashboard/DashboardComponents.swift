@@ -105,7 +105,7 @@ struct LocationFilterPills: View {
 struct ExpenseRow: View {
     let occurrence: ExpenseOccurrence
     let showsLocation: Bool
-    let onTogglePaid: () -> Void
+    var onTogglePaid: (() -> Void)?
 
     private var expense: FixedExpense { occurrence.expense }
 
@@ -123,13 +123,18 @@ struct ExpenseRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Button(action: onTogglePaid) {
+            if let onTogglePaid {
+                Button(action: onTogglePaid) {
+                    PaidCircle(isPaid: occurrence.isPaid)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(
+                    occurrence.isPaid ? "Mark \(expense.name) as unpaid" : "Mark \(expense.name) as paid"
+                )
+            } else {
                 PaidCircle(isPaid: occurrence.isPaid)
+                    .accessibilityHidden(true)
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel(
-                occurrence.isPaid ? "Mark \(expense.name) as unpaid" : "Mark \(expense.name) as paid"
-            )
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(expense.name)

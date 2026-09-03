@@ -71,6 +71,9 @@ card shows that month's fixed-cost total, a bar scaled against the year's heavie
 the year's monthly average: normal up to 110%, above average up to 150%, heavy beyond that. It reads every expense, so
 the dashboard's location filter does not narrow these totals.
 
+Tapping a card opens a read-only summary of that month: its total plus the expenses split into unpaid, paid and saving
+ahead. Marking as paid and editing stay on Home.
+
 ### Settings
 
 The Settings tab holds the base currency, the tracked locations, the reference exchange rates, and the iCloud controls.
@@ -135,7 +138,8 @@ SinkingFound/
 │   └── Theme.swift                  # Shared colors, spacing, and card styling
 ├── Features/
 │   ├── Calendar/
-│   │   └── CalendarView.swift       # Twelve-month expense overview
+│   │   ├── CalendarView.swift       # Twelve-month expense overview
+│   │   └── MonthDetailSheet.swift   # Read-only breakdown of a single month
 │   ├── Dashboard/
 │   │   ├── DashboardComponents.swift
 │   │   ├── DashboardView.swift      # Home screen for the selected month

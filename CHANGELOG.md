@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Home now reflects the selected month everywhere: the title, the summary card, the unpaid, paid and saving-ahead
   sections, the empty state, and the paid toggle, which records the period you are looking at. Editing an expense opens
   the form on that same month, while the add button still anchors a new expense to the real current month.
+- Month detail in the Calendar tab. Tapping a month card opens a read-only sheet with that month's fixed-cost total and
+  its expenses split into unpaid, paid and saving ahead. Nothing can be changed from there.
 
 ### Removed
 
