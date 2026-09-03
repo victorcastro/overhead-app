@@ -2,13 +2,11 @@ import SwiftUI
 import SwiftData
 
 enum DashboardSheet: Identifiable {
-    case newExpense
     case editExpense(FixedExpense)
     case monthPicker
 
     var id: String {
         switch self {
-        case .newExpense: "new"
         case .editExpense(let expense): String(describing: expense.persistentModelID)
         case .monthPicker: "monthPicker"
         }
@@ -25,6 +23,7 @@ struct DashboardView: View {
     @State private var filter: LocationFilter = .all
     @State private var isPaidExpanded = false
     @State private var activeSheet: DashboardSheet?
+    @State private var isAddingExpense = false
     @State private var selectedMonth = MonthWindow.currentMonth()
 
     private let currentMonth = MonthWindow.currentMonth()
@@ -85,19 +84,22 @@ struct DashboardView: View {
 
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        activeSheet = .newExpense
+                        isAddingExpense = true
                     } label: {
                         Image(systemName: "plus")
                     }
                     .accessibilityLabel("Add fixed expense")
                 }
             }
+            .navigationDestination(isPresented: $isAddingExpense) {
+                ExpenseFormView(expense: nil, month: currentMonth, showsCancelButton: false)
+            }
             .sheet(item: $activeSheet) { sheet in
                 switch sheet {
-                case .newExpense:
-                    ExpenseFormView(expense: nil, month: currentMonth)
                 case .editExpense(let expense):
-                    ExpenseFormView(expense: expense, month: selectedMonth)
+                    NavigationStack {
+                        ExpenseFormView(expense: expense, month: selectedMonth)
+                    }
                 case .monthPicker:
                     MonthPickerSheet(selection: $selectedMonth)
                 }

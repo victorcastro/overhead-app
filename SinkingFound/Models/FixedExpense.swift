@@ -120,6 +120,25 @@ final class FixedExpense {
         return dueDate(in: next, calendar: calendar) == nil
     }
 
+    func nextDueDate(onOrAfter date: Date = .now, calendar: Calendar = .current, monthsAhead: Int = 240) -> Date? {
+        let start = calendar.startOfDay(for: date)
+        guard let anchorMonth = calendar.dateInterval(of: .month, for: anchorDueDate)?.start,
+              let startMonth = calendar.dateInterval(of: .month, for: start)?.start
+        else { return nil }
+
+        var month = max(anchorMonth, startMonth)
+
+        for _ in 0..<monthsAhead {
+            if let due = dueDate(in: month, calendar: calendar), calendar.startOfDay(for: due) >= start {
+                return due
+            }
+            guard let next = calendar.date(byAdding: .month, value: 1, to: month) else { return nil }
+            month = next
+        }
+
+        return nil
+    }
+
     func finalDueDate(calendar: Calendar = .current) -> Date? {
         guard frequency != .oneTime, endRule == .afterOccurrences,
               let anchorMonthStart = calendar.dateInterval(of: .month, for: anchorDueDate)?.start,

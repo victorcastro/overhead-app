@@ -8,14 +8,48 @@ enum Currency: String, Codable, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    var symbol: String {
+    var format: CurrencyFormat {
         switch self {
-        case .eur: "€"
-        case .pen: "S/ "
-        case .usd: "$"
-        case .gbp: "£"
+        case .eur:
+            CurrencyFormat(
+                symbol: "€",
+                symbolPosition: .leading,
+                symbolSpacing: true,
+                decimalSeparator: ",",
+                groupingSeparator: ".",
+                inputFractionDigits: 2
+            )
+        case .pen:
+            CurrencyFormat(
+                symbol: "S/",
+                symbolPosition: .leading,
+                symbolSpacing: true,
+                decimalSeparator: ".",
+                groupingSeparator: ",",
+                inputFractionDigits: 2
+            )
+        case .usd:
+            CurrencyFormat(
+                symbol: "$",
+                symbolPosition: .leading,
+                symbolSpacing: false,
+                decimalSeparator: ".",
+                groupingSeparator: ",",
+                inputFractionDigits: 2
+            )
+        case .gbp:
+            CurrencyFormat(
+                symbol: "£",
+                symbolPosition: .leading,
+                symbolSpacing: false,
+                decimalSeparator: ".",
+                groupingSeparator: ",",
+                inputFractionDigits: 2
+            )
         }
     }
+
+    var symbol: String { format.symbol }
 
     var displayName: String {
         switch self {
@@ -47,21 +81,24 @@ enum Money {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         formatter.locale = Locale(identifier: "en_US")
-        formatter.groupingSeparator = ","
         formatter.usesGroupingSeparator = true
         return formatter
     }()
 
     static func sample(decimals: Int) -> String {
-        formatter.minimumFractionDigits = decimals
-        formatter.maximumFractionDigits = decimals
-        return formatter.string(from: NSDecimalNumber(value: 1234.5678)) ?? "0"
+        digits(NSDecimalNumber(value: 1234.5678), format: Currency.usd.format, decimals: decimals)
     }
 
     static func string(_ value: Decimal, currency: Currency, decimals: Int) -> String {
+        let format = currency.format
+        return format.display(digits(value as NSDecimalNumber, format: format, decimals: decimals))
+    }
+
+    private static func digits(_ value: NSDecimalNumber, format: CurrencyFormat, decimals: Int) -> String {
+        formatter.decimalSeparator = String(format.decimalSeparator)
+        formatter.groupingSeparator = String(format.groupingSeparator)
         formatter.minimumFractionDigits = decimals
         formatter.maximumFractionDigits = decimals
-        let digits = formatter.string(from: value as NSDecimalNumber) ?? "0"
-        return currency.symbol + digits
+        return formatter.string(from: value) ?? "0"
     }
 }
