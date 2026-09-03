@@ -26,19 +26,19 @@ enum Currency: String, Codable, CaseIterable, Identifiable {
         }
     }
 
-    private var unitsPerEUR: Decimal {
+    private var unitsPerUSD: Decimal {
         switch self {
-        case .eur: 1
-        case .pen: Decimal(407) / 100
-        case .usd: Decimal(108) / 100
-        case .gbp: Decimal(84) / 100
+        case .usd: 1
+        case .eur: Decimal(93) / 100
+        case .pen: Decimal(377) / 100
+        case .gbp: Decimal(78) / 100
         }
     }
 
     func amount(_ value: Decimal, to target: Currency) -> Decimal {
         guard self != target else { return value }
-        let valueInEUR = value / unitsPerEUR
-        return valueInEUR * target.unitsPerEUR
+        let valueInUSD = value / unitsPerUSD
+        return valueInUSD * target.unitsPerUSD
     }
 }
 
