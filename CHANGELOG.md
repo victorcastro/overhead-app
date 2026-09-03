@@ -47,6 +47,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Amounts on Home no longer drop their decimals. `Money.string` had defaulted to zero decimals, so every caller that
   omitted the argument rounded to whole units. The argument is now required.
+- Editing an expense no longer truncates its amount to two decimals. The form filled its amount field with a rounded
+  string, so saving after any edit wrote that rounded value back over the stored one.
 
 ## [1.1.0] - 2026-09-03
 

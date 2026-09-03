@@ -252,11 +252,7 @@ struct ExpenseFormView: View {
     }
 
     private static func editableAmount(_ value: Decimal) -> String {
-        var rounded = Decimal()
-        var source = value
-        NSDecimalRound(&rounded, &source, 0, .plain)
-        let digits = rounded == value ? 0 : 2
-        return String(format: "%.\(digits)f", (value as NSDecimalNumber).doubleValue)
+        "\(value)"
     }
 
     private func draft(amount: Decimal) -> FixedExpense {
