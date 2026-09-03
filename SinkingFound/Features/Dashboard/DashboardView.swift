@@ -127,13 +127,22 @@ struct DashboardView: View {
                     .padding(.bottom, 16)
             }
 
-            if !plan.unpaid.isEmpty {
-                SectionHeader(title: "Unpaid · \(plan.unpaid.count)")
-                CardList(data: plan.unpaid) { occurrence in
+            ForEach(plan.unpaidByCategory) { group in
+                SectionHeader(title: "\(group.category.label) · \(group.occurrences.count)")
+                CardList(data: group.occurrences) { occurrence in
                     ExpenseRow(occurrence: occurrence, showsLocation: showsLocation) {
                         togglePaid(occurrence, in: month)
                     }
                     .onTapGesture { activeSheet = .editExpense(occurrence.expense) }
+                }
+                .padding(.bottom, 16)
+            }
+
+            if !plan.annualAhead.isEmpty {
+                SectionHeader(title: "Saving ahead · \(plan.annualAhead.count)")
+                CardList(data: plan.annualAhead) { item in
+                    AnnualShareRow(item: item, showsLocation: showsLocation)
+                        .onTapGesture { activeSheet = .editExpense(item.expense) }
                 }
                 .padding(.bottom, 16)
             }
@@ -147,15 +156,6 @@ struct DashboardView: View {
                     onTogglePaid: { togglePaid($0, in: month) },
                     onSelect: { activeSheet = .editExpense($0.expense) }
                 )
-            }
-
-            if !plan.annualAhead.isEmpty {
-                SectionHeader(title: "Saving ahead · \(plan.annualAhead.count)")
-                CardList(data: plan.annualAhead) { item in
-                    AnnualShareRow(item: item, showsLocation: showsLocation)
-                        .onTapGesture { activeSheet = .editExpense(item.expense) }
-                }
-                .padding(.bottom, 16)
             }
 
             if plan.occurrences.isEmpty && plan.annualAhead.isEmpty {

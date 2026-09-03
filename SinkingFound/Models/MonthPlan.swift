@@ -21,6 +21,14 @@ struct AnnualShareItem: Identifiable {
     var monthlyShareInBase: Decimal { expense.amount(in: base) / 12 }
 }
 
+struct CategoryGroup: Identifiable {
+    let category: ExpenseCategory
+    let occurrences: [ExpenseOccurrence]
+
+    var id: String { category.rawValue }
+    var total: Decimal { occurrences.reduce(0) { $0 + $1.amountInBase } }
+}
+
 struct MonthPlan {
     let month: Date
     let base: Currency
@@ -77,6 +85,14 @@ struct MonthPlan {
 
     var paid: [ExpenseOccurrence] { occurrences.filter(\.isPaid) }
     var unpaid: [ExpenseOccurrence] { occurrences.filter { !$0.isPaid } }
+
+    var unpaidByCategory: [CategoryGroup] {
+        ExpenseCategory.allCases.compactMap { category in
+            let matches = unpaid.filter { $0.expense.category == category }
+            guard !matches.isEmpty else { return nil }
+            return CategoryGroup(category: category, occurrences: matches)
+        }
+    }
 
     var dueThisMonth: Decimal { occurrences.reduce(0) { $0 + $1.amountInBase } }
     var paidTotal: Decimal { paid.reduce(0) { $0 + $1.amountInBase } }
