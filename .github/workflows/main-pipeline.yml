@@ -76,7 +76,7 @@ jobs:
     name: Build and unit tests
     needs: version-and-changelog
     runs-on: macos-26
-    timeout-minutes: 20
+    timeout-minutes: 40
 
     steps:
       - name: Check out repository
@@ -100,13 +100,85 @@ jobs:
           xcodebuild -version
           swiftlint version
 
+      - name: Select iOS simulator
+        id: simulator
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          read_runtime() {
+            xcrun simctl list runtimes --json | jq -r '
+              [.runtimes[] | select(.isAvailable and (.identifier | contains("SimRuntime.iOS")))]
+              | sort_by(.version | split(".") | map(tonumber))
+              | last // empty
+              | "\(.identifier)\t\(.version)"'
+          }
+
+          runtime_line="$(read_runtime)"
+
+          if [[ -z "$runtime_line" ]]; then
+            echo "This runner image ships no iOS simulator runtime; downloading one."
+            xcodebuild -downloadPlatform iOS
+            runtime_line="$(read_runtime)"
+          fi
+
+          if [[ -z "$runtime_line" ]]; then
+            echo "::error::No iOS simulator runtime is available on this runner."
+            exit 1
+          fi
+
+          runtime="${runtime_line%%$'\t'*}"
+          runtime_version="${runtime_line##*$'\t'}"
+
+          udid="$(
+            xcrun simctl list devices available --json \
+              | jq -r --arg runtime "$runtime" '
+                  .devices[$runtime] // []
+                  | map(select(.isAvailable and (.name | startswith("iPhone"))))
+                  | first // empty
+                  | .udid'
+          )"
+
+          if [[ -z "$udid" ]]; then
+            echo "No iPhone simulator exists for iOS $runtime_version; creating one."
+            device_types="$(
+              xcrun simctl list devicetypes --json \
+                | jq -r --arg v "$runtime_version" '
+                    def packed:
+                      split(".") | map(tonumber)
+                      | (.[0] * 65536) + ((.[1] // 0) * 256) + (.[2] // 0);
+                    ($v | packed) as $target
+                    | [ .devicetypes[]
+                        | select(.productFamily == "iPhone")
+                        | select((.minRuntimeVersion // 0) <= $target)
+                        | select((.maxRuntimeVersion // 4294967295) >= $target) ]
+                    | .[].identifier'
+            )"
+
+            for device_type in $device_types; do
+              if udid="$(xcrun simctl create overhead-ci "$device_type" "$runtime" 2>/dev/null)"; then
+                echo "Created $device_type on iOS $runtime_version."
+                break
+              fi
+              udid=""
+            done
+          fi
+
+          if [[ -z "$udid" ]]; then
+            echo "::error::Could not find or create an iPhone simulator for iOS $runtime_version."
+            exit 1
+          fi
+
+          echo "Testing on simulator $udid (iOS $runtime_version)."
+          echo "udid=$udid" >> "$GITHUB_OUTPUT"
+
       - name: Build, lint, and run unit tests
         run: |
           xcodebuild test \
             -project Overhead.xcodeproj \
             -scheme Overhead \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 17' \
+            -destination "id=${{ steps.simulator.outputs.udid }}" \
             -derivedDataPath "$RUNNER_TEMP/DerivedData" \
             -resultBundlePath "$RUNNER_TEMP/OverheadTests.xcresult" \
             -only-testing:OverheadTests \
