@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct SinkingFoundApp: App {
+struct OverheadApp: App {
     @State private var settings: AppSettings
     @State private var container: ModelContainer
 

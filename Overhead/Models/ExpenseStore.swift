@@ -2,7 +2,7 @@ import Foundation
 import SwiftData
 
 enum ExpenseStore {
-    static let cloudContainerIdentifier = "iCloud.dev.victorcastro.SinkingFound"
+    static let cloudContainerIdentifier = "iCloud.dev.victorcastro.Overhead"
 
     static func makeContainer(cloudSyncEnabled: Bool) -> ModelContainer {
         let schema = Schema([FixedExpense.self])
@@ -16,7 +16,7 @@ enum ExpenseStore {
             if let container = try? ModelContainer(for: schema, configurations: [configuration]) {
                 return container
             }
-            print("[SinkingFound] CloudKit store unavailable, falling back to local storage.")
+            print("[Overhead] CloudKit store unavailable, falling back to local storage.")
         }
 
         return makeLocalContainer(schema: schema)

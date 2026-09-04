@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import SinkingFound
+@testable import Overhead
 
 struct MonthPlanTests {
     private let calendar = Calendar.current

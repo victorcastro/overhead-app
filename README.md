@@ -1,12 +1,12 @@
 <div align="center">
   <img
-    src="SinkingFound/Assets.xcassets/AppIcon.appiconset/1024.png"
-    alt="SinkingFound app icon"
+    src="Overhead/Assets.xcassets/AppIcon.appiconset/1024.png"
+    alt="Overhead app icon"
     width="128"
     height="128"
   />
 
-  # SinkingFound
+  # Overhead
 
   **Know what is due, what is paid, and what to set aside next.**
 
@@ -16,14 +16,14 @@
   ![Platform](https://img.shields.io/badge/platform-iOS%2018%2B-000000?style=flat-square&logo=apple)
   ![Swift](https://img.shields.io/badge/Swift-5.0-F05138?style=flat-square&logo=swift&logoColor=white)
   ![License](https://img.shields.io/badge/license-MIT-34C759?style=flat-square)
-  [![State CI](https://github.com/victorcastro/sinking-found/actions/workflows/main-pipeline.yml/badge.svg)](https://github.com/victorcastro/sinking-found/actions/workflows/main-pipeline.yml)
+  [![State CI](https://github.com/victorcastro/overhead-app/actions/workflows/main-pipeline.yml/badge.svg)](https://github.com/victorcastro/overhead-app/actions/workflows/main-pipeline.yml)
 </div>
 
 ---
 
 ## About
 
-SinkingFound turns fixed and recurring costs into a clear monthly plan. It helps answer three practical questions:
+Overhead turns fixed and recurring costs into a clear monthly plan. It helps answer three practical questions:
 
 1. How much is due this month?
 2. How much has already been paid?
@@ -98,7 +98,7 @@ and the expense form's location picker stay hidden.
 - **One-time:** appears only in its original month.
 - **Other:** repeats at a configurable interval measured in months.
 
-When a due day does not exist in a target month, SinkingFound uses that month's final valid day.
+When a due day does not exist in a target month, Overhead uses that month's final valid day.
 
 ## Requirements
 
@@ -111,16 +111,16 @@ The project has no third-party runtime dependencies and does not require depende
 ## Getting started
 
 1. Clone or fork this repository.
-2. Open `SinkingFound.xcodeproj` in Xcode.
-3. Select the `SinkingFound` scheme and an iOS 26+ simulator or device.
+2. Open `Overhead.xcodeproj` in Xcode.
+3. Select the `Overhead` scheme and an iOS 26+ simulator or device.
 4. Build and run with <kbd>⌘</kbd><kbd>R</kbd>.
 
 You can also build from the command line:
 
 ```sh
 xcodebuild \
-  -project SinkingFound.xcodeproj \
-  -scheme SinkingFound \
+  -project Overhead.xcodeproj \
+  -scheme Overhead \
   -sdk iphonesimulator \
   -configuration Debug \
   build CODE_SIGNING_ALLOWED=NO
@@ -130,8 +130,8 @@ Run the test suite with a simulator available on your machine:
 
 ```sh
 xcodebuild test \
-  -project SinkingFound.xcodeproj \
-  -scheme SinkingFound \
+  -project Overhead.xcodeproj \
+  -scheme Overhead \
   -destination 'platform=iOS Simulator,name=iPhone 17'
 ```
 
@@ -144,38 +144,41 @@ swiftlint lint
 ## Project structure
 
 ```text
-SinkingFound/
+Overhead/
 ├── Design/
-│   └── Theme.swift                  # Shared colors, spacing, and card styling
+│   ├── MoneyFormat.swift                # Money text styling shared by the screens
+│   └── Theme.swift                      # Shared colors, spacing, and card styling
 ├── Features/
 │   ├── Calendar/
-│   │   ├── CalendarView.swift       # Twelve-month expense overview, one page per year
-│   │   └── MonthDetailSheet.swift   # Read-only breakdown of a single month
+│   │   ├── CalendarView.swift           # Twelve-month expense overview, one page per year
+│   │   └── MonthDetailSheet.swift       # Read-only breakdown of a single month
 │   ├── Dashboard/
-│   │   ├── DashboardComponents.swift
-│   │   ├── DashboardView.swift      # Home screen for the selected month
-│   │   └── MonthPickerSheet.swift   # Month picker opened from the Home toolbar
-│   ├── ExpenseForm/
-│   │   └── ExpenseFormView.swift    # Create, edit, and delete expenses
+│   │   ├── Components/                  # Rows, cards, pills, and the month picker
+│   │   ├── DashboardView.swift          # Home screen for the selected month
+│   │   └── ExpenseForm/
+│   │       └── ExpenseFormView.swift    # Create, edit, and delete expenses
 │   ├── Root/
-│   │   └── RootTabView.swift        # Home, Calendar, and Settings tabs
+│   │   └── RootTabView.swift            # Home, Calendar, and Settings tabs
 │   └── Settings/
 │       ├── LocationSettingsView.swift
-│       └── SettingsView.swift       # iCloud, base currency, decimals, locations, exchange rates
+│       └── SettingsView.swift           # iCloud, base currency, decimals, locations, exchange rates
 ├── Models/
-│   ├── AppSettings.swift            # Base currency, decimals, locations, and the iCloud sync flag
-│   ├── CloudDataEraser.swift        # Deletes this app's data from the private iCloud database
-│   ├── Currency.swift               # Currency metadata and money formatting
-│   ├── ExpenseAttributes.swift      # Frequency, category, and location types
-│   ├── ExpenseStore.swift           # Builds the model container, with or without CloudKit
-│   ├── FixedExpense.swift           # SwiftData persistence model
-│   ├── KeyValueStore.swift          # Testable seam over NSUbiquitousKeyValueStore
-│   ├── Location.swift               # Country catalog
-│   ├── MonthPlan.swift              # Monthly planning calculations
-│   ├── MonthWindow.swift            # The range of months Home can reach
-│   └── YearWindow.swift             # The range of years the calendar can reach
-├── SinkingFound.entitlements        # iCloud container, CloudKit, and key-value store
-└── SinkingFoundApp.swift            # App entry point and model container
+│   ├── AmountInput.swift                # Parsing and sanitising of typed amounts
+│   ├── AppSettings.swift                # Base currency, decimals, locations, and the iCloud sync flag
+│   ├── CloudDataEraser.swift            # Deletes this app's data from the private iCloud database
+│   ├── Currency.swift                   # Currency metadata and money formatting
+│   ├── CurrencyFormat.swift             # Symbol placement and decimal rules per currency
+│   ├── ExpenseAttributes.swift          # Frequency, category, and location types
+│   ├── ExpenseStore.swift               # Builds the model container, with or without CloudKit
+│   ├── ExpenseSummary.swift             # Totals derived from a month's expenses
+│   ├── FixedExpense.swift               # SwiftData persistence model
+│   ├── KeyValueStore.swift              # Testable seam over NSUbiquitousKeyValueStore
+│   ├── Location.swift                   # Country catalog
+│   ├── MonthPlan.swift                  # Monthly planning calculations
+│   ├── MonthWindow.swift                # The range of months Home can reach
+│   └── YearWindow.swift                 # The range of years the calendar can reach
+├── Overhead.entitlements                # iCloud container, CloudKit, and key-value store
+└── OverheadApp.swift                    # App entry point and model container
 ```
 
 The codebase keeps persistence and recurrence rules in the model layer, month calculations in `MonthPlan`, and native
@@ -193,7 +196,7 @@ SwiftUI views inside feature folders. This separation makes the financial rules 
 - Deleting the app may also remove its local data unless it is restored through an operating-system backup.
 
 Enabling iCloud sync requires the *iCloud → CloudKit* and *Background Modes → Remote notifications* capabilities on the
-`SinkingFound` target, with the container `iCloud.dev.victorcastro.SinkingFound`. The schema is created in CloudKit's
+`Overhead` target, with the container `iCloud.dev.victorcastro.Overhead`. The schema is created in CloudKit's
 Development environment on first run and must be deployed to Production before an App Store release.
 
 > [!IMPORTANT]
@@ -239,6 +242,6 @@ Release history and notable changes are documented in [CHANGELOG.md](CHANGELOG.m
 
 ## License
 
-SinkingFound is available under the [MIT License](LICENSE).
+Overhead is available under the [MIT License](LICENSE).
 
 Copyright © 2026 Victor Castro.

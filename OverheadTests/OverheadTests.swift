@@ -1,7 +1,7 @@
 import Testing
-@testable import SinkingFound
+@testable import Overhead
 
-struct SinkingFoundTests {
+struct OverheadTests {
 
     @Test func example() async throws {
     }

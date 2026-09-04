@@ -1,6 +1,6 @@
 import XCTest
 
-final class SinkingFoundUITestsLaunchTests: XCTestCase {
+final class OverheadUITestsLaunchTests: XCTestCase {
 
     override static var runsForEachTargetApplicationUIConfiguration: Bool {
         true

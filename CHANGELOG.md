@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-09-04
+
+### Changed
+
+- The app is now called **Overhead**. The previous name described a sinking fund, money set aside for a future
+  expense, which is not what the app does: it tracks the fixed and recurring costs you already carry. "Overhead" names
+  that directly.
+- The rename is technical as well as cosmetic. The Xcode project, the app target and its test targets, the source
+  folders, and the Swift module are all called `Overhead` now, and the bundle identifier moved from
+  `dev.victorcastro.SinkingFound` to `dev.victorcastro.Overhead`.
+- The CloudKit container moved from `iCloud.dev.victorcastro.SinkingFound` to `iCloud.dev.victorcastro.Overhead`, and
+  the key-value store follows the new bundle identifier. No data migration is provided: the app has no released
+  version with users, so there is nothing in the old container to carry over.
+
 ## [1.2.0] - 2026-09-03
 
 ### Added

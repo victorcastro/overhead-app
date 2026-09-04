@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import SinkingFound
+@testable import Overhead
 
 private final class FakeKeyValueStore: KeyValueStore {
     var storage: [String: Any] = [:]

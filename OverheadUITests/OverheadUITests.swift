@@ -1,6 +1,6 @@
 import XCTest
 
-final class SinkingFoundUITests: XCTestCase {
+final class OverheadUITests: XCTestCase {
 
     override func setUpWithError() throws {
         continueAfterFailure = false
