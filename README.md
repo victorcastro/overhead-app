@@ -6,22 +6,22 @@
     height="128"
   />
 
-  # Overhead
-
-  **Know what is due, what is paid, and what to set aside next.**
-
-  A private, local-first iOS app for planning recurring expenses across months,
-  currencies, and countries, with optional iCloud sync.
-
+  # Overhead   
   ![Platform](https://img.shields.io/badge/platform-iOS%2026%2B-000000?style=flat-square&logo=apple)
   ![Swift](https://img.shields.io/badge/Swift-5.0-F05138?style=flat-square&logo=swift&logoColor=white)
   [![State CI](https://github.com/victorcastro/overhead-app/actions/workflows/main-pipeline.yml/badge.svg)](https://github.com/victorcastro/overhead-app/actions/workflows/main-pipeline.yml)
+    
+  **Know what is due, what is paid, and what to set aside next.**
+    
+  A private, local-first iOS app for planning recurring expenses across months,
+  currencies, and countries, with optional iCloud sync.
+
 </div>
 
 <p align="center">
-  <img src="docs/screenshots/home-dashboard.png" width="30%" alt="Monthly dashboard" />
-  <img src="docs/screenshots/annual-calendar.png" width="30%" alt="Annual calendar" />
-  <img src="docs/screenshots/expense-form.png" width="30%" alt="Expense form" />
+  <img src="docs/screenshots/home-dashboard.png" width="30%" style="margin: 0 8px;" alt="Monthly dashboard" />
+  <img src="docs/screenshots/annual-calendar.png" width="30%" style="margin: 0 8px;" alt="Annual calendar" />
+  <img src="docs/screenshots/expense-form.png" width="30%" style="margin: 0 8px;" alt="Expense form" />
 </p>
 
 ## How it works ?
