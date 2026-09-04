@@ -19,9 +19,11 @@
 </div>
 
 <p align="center">
-  <img src="docs/screenshots/home-dashboard.png" width="30%" style="margin: 0 8px;" alt="Monthly dashboard" />
-  <img src="docs/screenshots/annual-calendar.png" width="30%" style="margin: 0 8px;" alt="Annual calendar" />
-  <img src="docs/screenshots/expense-form.png" width="30%" style="margin: 0 8px;" alt="Expense form" />
+  <img src="docs/screenshots/home-dashboard.png" width="28%" alt="Monthly dashboard" />
+  &nbsp; &nbsp; &nbsp; &nbsp;
+  <img src="docs/screenshots/annual-calendar.png" width="28%" alt="Annual calendar" />
+  &nbsp; &nbsp; &nbsp; &nbsp;
+  <img src="docs/screenshots/expense-form.png" width="28%" alt="Expense form" />
 </p>
 
 ## How it works ?
