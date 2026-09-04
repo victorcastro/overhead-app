@@ -51,6 +51,11 @@ struct ExpenseFormView: View {
 
     private var frequencySummary: String { ExpenseSummary.frequency(draft(amount: amount ?? 1)) }
 
+    private var scheduleSummary: String {
+        guard let endSummary else { return frequencySummary }
+        return "\(frequencySummary) \(endSummary)"
+    }
+
     init(expense: FixedExpense?, month: Date, showsCancelButton: Bool = true) {
         self.expense = expense
         self.month = month
@@ -158,9 +163,34 @@ struct ExpenseFormView: View {
                         .listRowBackground(Theme.card)
                 }
             } footer: {
-                Text(frequencySummary)
-                    .font(.system(size: 12))
-                    .foregroundStyle(Theme.secondaryText)
+                if frequency == .oneTime {
+                    Text(scheduleSummary)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.secondaryText)
+                }
+            }
+            .listSectionSpacing(8)
+
+            if frequency != .oneTime {
+                Section {
+                    Picker("Expense ends", selection: $endRule) {
+                        ForEach(ExpenseEndRule.allCases) { Text($0.label).tag($0) }
+                    }
+                    .pickerStyle(.navigationLink)
+
+                    if endRule == .afterOccurrences {
+                        Stepper("Repetitions: \(endOccurrences)", value: $endOccurrences, in: 1...240)
+                    }
+
+                    if endRule == .onDate {
+                        DatePicker("Last due date", selection: $endDate, displayedComponents: .date)
+                    }
+                } footer: {
+                    Text(scheduleSummary)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.secondaryText)
+                }
+                .listRowBackground(Theme.card)
             }
 
             Section {
@@ -170,10 +200,7 @@ struct ExpenseFormView: View {
                         .focused($focusedField, equals: .name)
                         .submitLabel(.done)
                 }
-            }
-            .listRowBackground(Theme.card)
 
-            Section {
                 DatePicker("Due date", selection: $dueDate, displayedComponents: .date)
 
                 Picker("Category", selection: $category) {
@@ -203,30 +230,6 @@ struct ExpenseFormView: View {
                 }
             }
             .listRowBackground(Theme.card)
-
-            if frequency != .oneTime {
-                Section {
-                    Picker("Ends", selection: $endRule) {
-                        ForEach(ExpenseEndRule.allCases) { Text($0.label).tag($0) }
-                    }
-                    .pickerStyle(.navigationLink)
-
-                    if endRule == .afterOccurrences {
-                        Stepper("Repetitions: \(endOccurrences)", value: $endOccurrences, in: 1...240)
-                    }
-
-                    if endRule == .onDate {
-                        DatePicker("Last due date", selection: $endDate, displayedComponents: .date)
-                    }
-                } footer: {
-                    if let endSummary {
-                        Text(endSummary)
-                            .font(.system(size: 12))
-                            .foregroundStyle(Theme.secondaryText)
-                    }
-                }
-                .listRowBackground(Theme.card)
-            }
 
             if isEditing, !isReadOnly {
                 Section {
