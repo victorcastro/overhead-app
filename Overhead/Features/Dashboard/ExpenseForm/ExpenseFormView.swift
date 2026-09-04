@@ -172,9 +172,20 @@ struct ExpenseFormView: View {
                 DatePicker("Due date", selection: $dueDate, displayedComponents: .date)
 
                 Picker("Category", selection: $category) {
-                    ForEach(ExpenseCategory.allCases) { Text($0.label).tag($0) }
+                    ForEach(ExpenseCategory.allCases) { category in
+                        Label {
+                            Text(category.label)
+                                .foregroundStyle(Theme.primaryText)
+                        } icon: {
+                            Image(systemName: category.sfSymbol)
+                                .foregroundStyle(Theme.secondaryText)
+                        }
+                        .tag(category)
+                    }
                 }
                 .pickerStyle(.navigationLink)
+                .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
+                .alignmentGuide(.listRowSeparatorTrailing) { dimension in dimension.width }
 
                 if settings.hasLocations {
                     Picker("Location", selection: $location) {

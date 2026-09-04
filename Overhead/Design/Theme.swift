@@ -29,15 +29,22 @@ extension View {
 
 struct SectionHeader: View {
     let title: String
+    var icon: String?
 
     var body: some View {
-        Text(title.uppercased())
-            .font(.system(size: 13, weight: .semibold))
-            .kerning(0.4)
-            .foregroundStyle(Theme.headerText)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 4)
-            .padding(.bottom, 8)
+        HStack(spacing: 6) {
+            if let icon {
+                Image(systemName: icon)
+                    .font(.system(size: 12, weight: .semibold))
+            }
+            Text(title.uppercased())
+                .font(.system(size: 13, weight: .semibold))
+                .kerning(0.4)
+        }
+        .foregroundStyle(Theme.headerText)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 4)
+        .padding(.bottom, 8)
     }
 }
 

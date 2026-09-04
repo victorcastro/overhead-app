@@ -5,12 +5,22 @@ struct MonthSummaryCard: View {
 
     let plan: MonthPlan
     let monthName: String
+    var isCurrentMonth = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("Left to pay this month")
-                .font(.system(size: 12))
-                .foregroundStyle(Theme.secondaryText)
+            HStack {
+                Text("Left to pay this month")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.secondaryText)
+                if isCurrentMonth {
+                    Spacer()
+                    Text("CURRENT")
+                        .font(.system(size: 11, weight: .semibold))
+                        .kerning(0.4)
+                        .foregroundStyle(Theme.positive)
+                }
+            }
 
             Text(money(plan.leftToPayThisMonth, plan.base))
                 .font(.system(size: 44, weight: .bold))

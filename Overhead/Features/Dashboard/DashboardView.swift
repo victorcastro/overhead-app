@@ -138,7 +138,7 @@ struct DashboardView: View {
         let plan = plan(for: month)
 
         VStack(spacing: 0) {
-            MonthSummaryCard(plan: plan, monthName: monthTitle(for: month))
+            MonthSummaryCard(plan: plan, monthName: monthTitle(for: month), isCurrentMonth: month == currentMonth)
                 .padding(.bottom, 16)
 
             if settings.hasMultipleLocations {
@@ -147,7 +147,10 @@ struct DashboardView: View {
             }
 
             ForEach(plan.unpaidByCategory) { group in
-                SectionHeader(title: "\(group.category.label) · \(money(group.total, plan.base))")
+                SectionHeader(
+                    title: "\(group.category.label) · \(money(group.total, plan.base))",
+                    icon: group.category.sfSymbol
+                )
                 CardList(data: group.occurrences) { occurrence in
                     ExpenseRow(occurrence: occurrence, showsLocation: showsLocation) {
                         togglePaid(occurrence, in: month)
