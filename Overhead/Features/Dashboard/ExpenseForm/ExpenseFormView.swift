@@ -30,6 +30,7 @@ struct ExpenseFormView: View {
     @State private var dueDate: Date
     @State private var isConfirmingDelete = false
     @State private var didAppear = false
+    @State private var isReadOnly: Bool
     @FocusState private var focusedField: Field?
 
     private var isEditing: Bool { expense != nil }
@@ -54,6 +55,7 @@ struct ExpenseFormView: View {
         self.expense = expense
         self.month = month
         self.showsCancelButton = showsCancelButton
+        _isReadOnly = State(initialValue: expense != nil)
         _name = State(initialValue: expense?.name ?? "")
         let resolvedCurrency = expense?.currency ?? .usd
         _amountText = State(initialValue: expense.map { AmountInput.editable($0.amount, for: resolvedCurrency) } ?? "")
@@ -126,7 +128,10 @@ struct ExpenseFormView: View {
         amountField
             .frame(maxWidth: .infinity)
             .contentShape(Rectangle())
-            .onTapGesture { focusedField = .amount }
+            .onTapGesture {
+                guard !isReadOnly else { return }
+                focusedField = .amount
+            }
             .padding(.horizontal, Theme.horizontalPadding)
             .padding(.bottom, 8)
     }
@@ -223,7 +228,7 @@ struct ExpenseFormView: View {
                 .listRowBackground(Theme.card)
             }
 
-            if isEditing {
+            if isEditing, !isReadOnly {
                 Section {
                     Button("Delete expense", role: .destructive) {
                         isConfirmingDelete = true
@@ -234,6 +239,7 @@ struct ExpenseFormView: View {
                 .listRowBackground(Theme.card)
             }
         }
+        .disabled(isReadOnly)
         .scrollContentBackground(.hidden)
         .scrollDismissesKeyboard(.interactively)
         .contentMargins(.top, 0, for: .scrollContent)
@@ -241,15 +247,21 @@ struct ExpenseFormView: View {
         .toolbar(.hidden, for: .tabBar)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            if showsCancelButton {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+            if isReadOnly {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Edit") { isReadOnly = false }
                 }
-            }
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Save") { save() }
-                    .fontWeight(.semibold)
-                    .disabled(!canSave)
+            } else {
+                if showsCancelButton {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") { dismiss() }
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") { save() }
+                        .fontWeight(.semibold)
+                        .disabled(!canSave)
+                }
             }
         }
         .confirmationDialog(
@@ -281,7 +293,10 @@ struct ExpenseFormView: View {
         }
     }
 
-    private func draft(amount: Decimal) -> FixedExpense {
+}
+
+extension ExpenseFormView {
+    fileprivate func draft(amount: Decimal) -> FixedExpense {
         FixedExpense(
             name: name,
             amount: amount,
@@ -297,7 +312,7 @@ struct ExpenseFormView: View {
         )
     }
 
-    private func save() {
+    fileprivate func save() {
         guard let amount else { return }
         let trimmedName = name.trimmingCharacters(in: .whitespaces)
 
@@ -322,7 +337,7 @@ struct ExpenseFormView: View {
         dismiss()
     }
 
-    private func delete() {
+    fileprivate func delete() {
         if let expense {
             modelContext.delete(expense)
         }
