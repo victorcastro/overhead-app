@@ -29,6 +29,7 @@ struct ExpenseFormView: View {
     @State private var location: String
     @State private var dueDate: Date
     @State private var isConfirmingDelete = false
+    @State private var didAppear = false
     @FocusState private var focusedField: Field?
 
     private var isEditing: Bool { expense != nil }
@@ -79,31 +80,26 @@ struct ExpenseFormView: View {
         }
     }
 
-    private var currencySymbol: some View {
-        Text(currency.format.symbol)
-            .font(.system(size: amountFontSize * 0.6, weight: .semibold, design: .rounded))
-            .foregroundStyle(Theme.secondaryText)
-    }
-
     private var currencyMenu: some View {
         Menu {
             Picker("Currency", selection: $currency) {
                 ForEach(Currency.allCases) { Text($0.rawValue).tag($0) }
             }
         } label: {
-            HStack(spacing: 3) {
-                Text(currency.rawValue)
-                Image(systemName: "chevron.down").font(.system(size: 10, weight: .semibold))
+            HStack(alignment: .firstTextBaseline, spacing: 2) {
+                Text(currency.format.symbol)
+                    .font(.system(size: amountFontSize * 0.6, weight: .semibold, design: .rounded))
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 9, weight: .semibold))
             }
-            .font(.system(size: 13, weight: .medium))
             .foregroundStyle(Theme.secondaryText)
         }
     }
 
     private var amountField: some View {
-        HStack(alignment: .firstTextBaseline, spacing: currency.format.symbolSpacing ? 10 : 2) {
+        HStack(alignment: .firstTextBaseline, spacing: 10) {
             if currency.format.symbolPosition == .leading {
-                currencySymbol
+                currencyMenu
             }
 
             TextField("0", text: $amountText)
@@ -121,21 +117,18 @@ struct ExpenseFormView: View {
                 }
 
             if currency.format.symbolPosition == .trailing {
-                currencySymbol
+                currencyMenu
             }
         }
     }
 
     private var amountHeader: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 10) {
-            currencyMenu
-            amountField
-        }
-        .frame(maxWidth: .infinity)
-        .contentShape(Rectangle())
-        .onTapGesture { focusedField = .amount }
-        .padding(.horizontal, Theme.horizontalPadding)
-        .padding(.bottom, 20)
+        amountField
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+            .onTapGesture { focusedField = .amount }
+            .padding(.horizontal, Theme.horizontalPadding)
+            .padding(.bottom, 8)
     }
 
     var body: some View {
@@ -145,6 +138,7 @@ struct ExpenseFormView: View {
             }
             .listRowInsets(EdgeInsets())
             .listRowBackground(Color.clear)
+            .listSectionSpacing(8)
 
             Section {
                 Picker("Frequency", selection: $frequency) {
@@ -166,7 +160,7 @@ struct ExpenseFormView: View {
 
             Section {
                 LabeledRow(label: "Name") {
-                    TextField("Electricity", text: $name)
+                    TextField("", text: $name)
                         .foregroundStyle(Theme.primaryText)
                         .focused($focusedField, equals: .name)
                         .submitLabel(.done)
@@ -260,6 +254,9 @@ struct ExpenseFormView: View {
         .preferredColorScheme(.dark)
         .tint(Theme.accent)
         .onAppear {
+            guard !didAppear else { return }
+            didAppear = true
+
             if !location.isEmpty, !settings.locationCodes.contains(location) {
                 location = ""
             }
