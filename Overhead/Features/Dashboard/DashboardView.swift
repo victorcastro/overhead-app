@@ -79,6 +79,7 @@ struct DashboardView: View {
                     } label: {
                         Image(systemName: "calendar")
                     }
+                    .tint(Theme.primaryText)
                     .accessibilityLabel("Choose month")
                 }
 
@@ -88,11 +89,12 @@ struct DashboardView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
+                    .tint(Theme.primaryText)
                     .accessibilityLabel("Add fixed expense")
                 }
             }
             .navigationDestination(isPresented: $isAddingExpense) {
-                ExpenseFormView(expense: nil, month: currentMonth, showsCancelButton: false)
+                ExpenseFormView(expense: nil, month: selectedMonth, showsCancelButton: false)
             }
             .sheet(item: $activeSheet) { sheet in
                 switch sheet {
