@@ -18,6 +18,12 @@
   [![State CI](https://github.com/victorcastro/overhead-app/actions/workflows/main-pipeline.yml/badge.svg)](https://github.com/victorcastro/overhead-app/actions/workflows/main-pipeline.yml)
 </div>
 
+<p align="center">
+  <img src="docs/screenshots/home-dashboard.png" width="30%" alt="Monthly dashboard" />
+  <img src="docs/screenshots/annual-calendar.png" width="30%" alt="Annual calendar" />
+  <img src="docs/screenshots/expense-form.png" width="30%" alt="Expense form" />
+</p>
+
 ## How it works ?
 
 **Home** shows the selected month split into still to set aside, unpaid, paid, and saving ahead for future annual
