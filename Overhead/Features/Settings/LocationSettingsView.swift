@@ -8,6 +8,7 @@ struct LocationSettingsView: View {
 
     @State private var query = ""
     @State private var pendingDeletion: PendingDeletion?
+    @FocusState private var searchFieldFocused: Bool
 
     private struct PendingDeletion: Identifiable {
         let code: String
@@ -36,24 +37,24 @@ struct LocationSettingsView: View {
     var body: some View {
         List {
             Section {
-                if selectedCountries.isEmpty {
-                    Text("No locations yet. Search below to add countries.")
-                        .font(.system(size: 13))
+                HStack(spacing: 8) {
+                    Image(systemName: "magnifyingglass")
                         .foregroundStyle(Theme.secondaryText)
-                } else {
-                    ForEach(selectedCountries) { country in
-                        Text(country.name)
-                            .foregroundStyle(Theme.primaryText)
+                    TextField("Search a country to add", text: $query)
+                        .foregroundStyle(Theme.primaryText)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.words)
+                        .focused($searchFieldFocused)
+                    if !query.isEmpty {
+                        Button {
+                            query = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(Theme.secondaryText)
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .onDelete(perform: requestDelete)
                 }
-            } header: {
-                Text("Your locations")
-                    .textCase(nil)
-            } footer: {
-                Text("Deleting a location moves any expense using it back to Undefined.")
-                    .font(.system(size: 12))
-                    .foregroundStyle(Theme.secondaryText)
             }
             .listRowBackground(Theme.card)
 
@@ -78,13 +79,50 @@ struct LocationSettingsView: View {
                         .textCase(nil)
                 }
                 .listRowBackground(Theme.card)
+            } else if !query.trimmingCharacters(in: .whitespaces).isEmpty {
+                Section {
+                    Text("No countries match \u{201C}\(query)\u{201D}.")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Theme.secondaryText)
+                }
+                .listRowBackground(Theme.card)
+            }
+
+            if selectedCountries.isEmpty {
+                Section {
+                    Text("No locations yet. Countries you add will show up here.")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Theme.secondaryText)
+                }
+                .listRowBackground(Theme.card)
+            } else {
+                Section {
+                    ForEach(selectedCountries) { country in
+                        Text(country.name)
+                            .foregroundStyle(Theme.primaryText)
+                    }
+                    .onDelete(perform: requestDelete)
+                } header: {
+                    Text("Your locations")
+                        .textCase(nil)
+                } footer: {
+                    Text("Deleting a location moves any expense using it back to Undefined.")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.secondaryText)
+                }
+                .listRowBackground(Theme.card)
             }
         }
         .scrollContentBackground(.hidden)
         .background(Theme.background)
-        .searchable(text: $query, prompt: "Search countries")
         .navigationTitle("Locations")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                searchFieldFocused = true
+            }
+        }
         .confirmationDialog(
             "Delete this location?",
             isPresented: Binding(

@@ -13,7 +13,7 @@ struct NotificationSettingsSection: View {
         @Bindable var settings = settings
 
         return Section {
-            Toggle("Remind me before due dates", isOn: $settings.remindersEnabled)
+            Toggle("Notify before due date", isOn: $settings.remindersEnabled)
                 .foregroundStyle(Theme.primaryText)
                 .disabled(isRequesting)
 
@@ -30,8 +30,6 @@ struct NotificationSettingsSection: View {
                 Button("Open Settings") { openSystemSettings() }
                     .foregroundStyle(Theme.primaryText)
             }
-        } header: {
-            Text("Notifications")
         } footer: {
             Text(footer)
                 .font(.system(size: 12))
