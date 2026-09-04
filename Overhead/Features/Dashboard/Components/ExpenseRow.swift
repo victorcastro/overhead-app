@@ -9,17 +9,30 @@ struct ExpenseRow: View {
 
     private var expense: FixedExpense { occurrence.expense }
 
-    private var subtitle: String {
-        var parts: [String] = [Self.cadenceLabel(for: expense)]
-        var status = occurrence.isPaid ? "Paid" : Self.dueDescription(occurrence.dueDate)
+    private var dueColor: Color {
+        guard !occurrence.isPaid else { return Theme.secondaryText }
+        return switch Self.daysUntilDue(occurrence.dueDate) {
+        case ..<3: Theme.destructive
+        case 3..<8: Theme.warning
+        default: Theme.secondaryText
+        }
+    }
+
+    private var subtitle: Text {
+        var segments = [Text(Self.cadenceLabel(for: expense)), Text(" · ")]
+
+        segments.append(
+            occurrence.isPaid
+                ? Text("Paid")
+                : Text(Self.dueDescription(occurrence.dueDate)).foregroundStyle(dueColor)
+        )
         if occurrence.isFinal {
-            status += " (last payment)"
+            segments.append(Text(" (last payment)"))
         }
-        parts.append(status)
         if showsLocation, let name = Location.name(for: expense.location) {
-            parts.append(name)
+            segments.append(Text(" · \(name)"))
         }
-        return parts.joined(separator: " · ")
+        return segments.reduce(Text(""), +)
     }
 
     var body: some View {
@@ -42,7 +55,7 @@ struct ExpenseRow: View {
                     .font(.system(size: 15))
                     .foregroundStyle(occurrence.isPaid ? Theme.secondaryText : Theme.primaryText)
                     .strikethrough(occurrence.isPaid, color: Theme.secondaryText)
-                Text(subtitle)
+                subtitle
                     .font(.system(size: 12))
                     .foregroundStyle(Theme.secondaryText)
             }
@@ -76,10 +89,14 @@ struct ExpenseRow: View {
         }
     }
 
-    static func dueDescription(_ dueDate: Date, calendar: Calendar = .current, now: Date = .now) -> String {
+    static func daysUntilDue(_ dueDate: Date, calendar: Calendar = .current, now: Date = .now) -> Int {
         let start = calendar.startOfDay(for: now)
         let end = calendar.startOfDay(for: dueDate)
-        let days = calendar.dateComponents([.day], from: start, to: end).day ?? 0
+        return calendar.dateComponents([.day], from: start, to: end).day ?? 0
+    }
+
+    static func dueDescription(_ dueDate: Date, calendar: Calendar = .current, now: Date = .now) -> String {
+        let days = daysUntilDue(dueDate, calendar: calendar, now: now)
         switch days {
         case 0: return "today"
         case 1: return "tomorrow"
