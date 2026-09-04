@@ -37,5 +37,6 @@ struct RootTabView: View {
         }
         .preferredColorScheme(.dark)
         .tint(Theme.accent)
+        .background { ReminderSyncView() }
     }
 }

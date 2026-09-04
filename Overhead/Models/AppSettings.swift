@@ -7,8 +7,13 @@ final class AppSettings {
     static let locationCodesKey = "locationCodes"
     static let decimalPlacesKey = "decimalPlaces"
     private static let iCloudSyncEnabledKey = "iCloudSyncEnabled"
+    static let remindersEnabledKey = "remindersEnabled"
+    static let reminderDaysBeforeKey = "reminderDaysBefore"
     static let defaultDecimalPlaces = 2
     static let decimalPlacesOptions = Array(0...4)
+    static let defaultReminderDaysBefore = 1
+    static let reminderDaysBeforeOptions = [0, 1, 3, 7]
+    static let reminderHour = 9
 
     var baseCurrency: Currency {
         didSet {
@@ -31,6 +36,8 @@ final class AppSettings {
             mirrorToCloud(baseCurrency.rawValue, forKey: Self.baseCurrencyKey)
             mirrorToCloud(locationCodes, forKey: Self.locationCodesKey)
             mirrorToCloud(decimalPlaces, forKey: Self.decimalPlacesKey)
+            mirrorToCloud(remindersEnabled, forKey: Self.remindersEnabledKey)
+            mirrorToCloud(reminderDaysBefore, forKey: Self.reminderDaysBeforeKey)
         }
     }
 
@@ -40,6 +47,23 @@ final class AppSettings {
             guard decimalPlaces != oldValue else { return }
             defaults.set(decimalPlaces, forKey: Self.decimalPlacesKey)
             mirrorToCloud(decimalPlaces, forKey: Self.decimalPlacesKey)
+        }
+    }
+
+    var remindersEnabled: Bool {
+        didSet {
+            guard remindersEnabled != oldValue else { return }
+            defaults.set(remindersEnabled, forKey: Self.remindersEnabledKey)
+            mirrorToCloud(remindersEnabled, forKey: Self.remindersEnabledKey)
+        }
+    }
+
+    var reminderDaysBefore: Int {
+        didSet {
+            reminderDaysBefore = Self.clampedReminderDaysBefore(reminderDaysBefore)
+            guard reminderDaysBefore != oldValue else { return }
+            defaults.set(reminderDaysBefore, forKey: Self.reminderDaysBeforeKey)
+            mirrorToCloud(reminderDaysBefore, forKey: Self.reminderDaysBeforeKey)
         }
     }
 
@@ -77,6 +101,16 @@ final class AppSettings {
             cloudDecimals ?? storedDecimals ?? Self.defaultDecimalPlaces
         )
 
+        let cloudReminders = syncEnabled ? ubiquitous.object(forKey: Self.remindersEnabledKey) as? Bool : nil
+        let storedReminders = defaults.object(forKey: Self.remindersEnabledKey) as? Bool
+        remindersEnabled = cloudReminders ?? storedReminders ?? false
+
+        let cloudDaysBefore = syncEnabled ? ubiquitous.object(forKey: Self.reminderDaysBeforeKey) as? Int : nil
+        let storedDaysBefore = defaults.object(forKey: Self.reminderDaysBeforeKey) as? Int
+        reminderDaysBefore = Self.clampedReminderDaysBefore(
+            cloudDaysBefore ?? storedDaysBefore ?? Self.defaultReminderDaysBefore
+        )
+
         observeExternalChanges()
     }
 
@@ -91,10 +125,16 @@ final class AppSettings {
         return min(max(value, first), last)
     }
 
+    static func clampedReminderDaysBefore(_ value: Int) -> Int {
+        reminderDaysBeforeOptions.contains(value) ? value : defaultReminderDaysBefore
+    }
+
     func clearCloudMirror() {
         ubiquitous.removeObject(forKey: Self.baseCurrencyKey)
         ubiquitous.removeObject(forKey: Self.locationCodesKey)
         ubiquitous.removeObject(forKey: Self.decimalPlacesKey)
+        ubiquitous.removeObject(forKey: Self.remindersEnabledKey)
+        ubiquitous.removeObject(forKey: Self.reminderDaysBeforeKey)
         ubiquitous.synchronize()
     }
 
@@ -134,6 +174,16 @@ final class AppSettings {
         if let decimals = ubiquitous.object(forKey: Self.decimalPlacesKey) as? Int,
            Self.clampedDecimalPlaces(decimals) != decimalPlaces {
             decimalPlaces = decimals
+        }
+
+        if let enabled = ubiquitous.object(forKey: Self.remindersEnabledKey) as? Bool,
+           enabled != remindersEnabled {
+            remindersEnabled = enabled
+        }
+
+        if let daysBefore = ubiquitous.object(forKey: Self.reminderDaysBeforeKey) as? Int,
+           Self.clampedReminderDaysBefore(daysBefore) != reminderDaysBefore {
+            reminderDaysBefore = daysBefore
         }
     }
 }

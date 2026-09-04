@@ -53,6 +53,9 @@ to work. iCloud sync is off by default; turning it on in Settings keeps everythi
 iCloud account, and turning it back off simply stops syncing without deleting anything. Settings also has a separate,
 explicit action to erase the app's iCloud data, so nothing is ever deleted as a side effect of another setting.
 
+Settings also lets you download your data as a file for backup or transfer, and upload one back in, choosing whether
+to merge it with what's on the device or replace everything.
+
 There is no analytics, no account system, and no remote backend beyond the user's own iCloud.
 
 > [!IMPORTANT]

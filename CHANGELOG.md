@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.3.0] - 2026-09-04
 
+### Added
+
+- An iCloud screen of its own, reached from Settings. The sync toggle and the action that deletes the iCloud copy moved
+  there out of the Settings tab, which was mixing them with currency, decimals and locations.
+- Download and upload of your data as a file, inside that iCloud screen. The backup is plain JSON holding every expense
+  with its payment history, plus the base currency, decimals and locations. Amounts travel as strings rather than JSON
+  numbers so a decimal survives the round trip exactly, and the file carries a format tag and a version so a foreign
+  file is rejected instead of half-imported.
+- A choice when uploading a file, asked before anything is written. **Merge** adds the expenses the device does not
+  have and unions the payment history, never overwriting a field you edited here; two expenses count as the same one
+  when their name, amount, currency, frequency, interval, location and anchor date match, so recategorising an expense
+  or giving it an end date does not duplicate it. **Replace all** wipes the device and leaves exactly what the file
+  holds, and asks for a second confirmation that spells out how many expenses are being deleted.
+- Due-date reminders, in the Settings tab: a toggle and a choice of how many days ahead to be warned. They are local
+  notifications delivered at 09:00, so no server is involved, and they skip periods already marked as paid and stop on
+  their own when a recurrence ends. At most 60 are scheduled at a time and at most 6 per expense, always the nearest
+  ones, refreshed whenever the app comes to the foreground: iOS keeps only the 64 closest pending local notifications
+  and drops the rest without saying so.
+
 ### Changed
 
 - The app is now called **Overhead**. The previous name described a sinking fund, money set aside for a future
