@@ -30,6 +30,7 @@ struct ExpenseFormView: View {
     @State private var dueDate: Date
     @State private var isConfirmingDelete = false
     @State private var didAppear = false
+    @State private var isReadOnly: Bool
     @FocusState private var focusedField: Field?
 
     private var isEditing: Bool { expense != nil }
@@ -50,10 +51,16 @@ struct ExpenseFormView: View {
 
     private var frequencySummary: String { ExpenseSummary.frequency(draft(amount: amount ?? 1)) }
 
+    private var scheduleSummary: String {
+        guard let endSummary else { return frequencySummary }
+        return "\(frequencySummary) \(endSummary)"
+    }
+
     init(expense: FixedExpense?, month: Date, showsCancelButton: Bool = true) {
         self.expense = expense
         self.month = month
         self.showsCancelButton = showsCancelButton
+        _isReadOnly = State(initialValue: expense != nil)
         _name = State(initialValue: expense?.name ?? "")
         let resolvedCurrency = expense?.currency ?? .usd
         _amountText = State(initialValue: expense.map { AmountInput.editable($0.amount, for: resolvedCurrency) } ?? "")
@@ -126,7 +133,10 @@ struct ExpenseFormView: View {
         amountField
             .frame(maxWidth: .infinity)
             .contentShape(Rectangle())
-            .onTapGesture { focusedField = .amount }
+            .onTapGesture {
+                guard !isReadOnly else { return }
+                focusedField = .amount
+            }
             .padding(.horizontal, Theme.horizontalPadding)
             .padding(.bottom, 8)
     }
@@ -153,9 +163,34 @@ struct ExpenseFormView: View {
                         .listRowBackground(Theme.card)
                 }
             } footer: {
-                Text(frequencySummary)
-                    .font(.system(size: 12))
-                    .foregroundStyle(Theme.secondaryText)
+                if frequency == .oneTime {
+                    Text(scheduleSummary)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.secondaryText)
+                }
+            }
+            .listSectionSpacing(8)
+
+            if frequency != .oneTime {
+                Section {
+                    Picker("Expense ends", selection: $endRule) {
+                        ForEach(ExpenseEndRule.allCases) { Text($0.label).tag($0) }
+                    }
+                    .pickerStyle(.navigationLink)
+
+                    if endRule == .afterOccurrences {
+                        Stepper("Repetitions: \(endOccurrences)", value: $endOccurrences, in: 1...240)
+                    }
+
+                    if endRule == .onDate {
+                        DatePicker("Last due date", selection: $endDate, displayedComponents: .date)
+                    }
+                } footer: {
+                    Text(scheduleSummary)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.secondaryText)
+                }
+                .listRowBackground(Theme.card)
             }
 
             Section {
@@ -165,16 +200,24 @@ struct ExpenseFormView: View {
                         .focused($focusedField, equals: .name)
                         .submitLabel(.done)
                 }
-            }
-            .listRowBackground(Theme.card)
 
-            Section {
                 DatePicker("Due date", selection: $dueDate, displayedComponents: .date)
 
                 Picker("Category", selection: $category) {
-                    ForEach(ExpenseCategory.allCases) { Text($0.label).tag($0) }
+                    ForEach(ExpenseCategory.allCases) { category in
+                        Label {
+                            Text(category.label)
+                                .foregroundStyle(Theme.primaryText)
+                        } icon: {
+                            Image(systemName: category.sfSymbol)
+                                .foregroundStyle(Theme.secondaryText)
+                        }
+                        .tag(category)
+                    }
                 }
                 .pickerStyle(.navigationLink)
+                .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
+                .alignmentGuide(.listRowSeparatorTrailing) { dimension in dimension.width }
 
                 if settings.hasLocations {
                     Picker("Location", selection: $location) {
@@ -188,31 +231,7 @@ struct ExpenseFormView: View {
             }
             .listRowBackground(Theme.card)
 
-            if frequency != .oneTime {
-                Section {
-                    Picker("Ends", selection: $endRule) {
-                        ForEach(ExpenseEndRule.allCases) { Text($0.label).tag($0) }
-                    }
-                    .pickerStyle(.navigationLink)
-
-                    if endRule == .afterOccurrences {
-                        Stepper("Repetitions: \(endOccurrences)", value: $endOccurrences, in: 1...240)
-                    }
-
-                    if endRule == .onDate {
-                        DatePicker("Last due date", selection: $endDate, displayedComponents: .date)
-                    }
-                } footer: {
-                    if let endSummary {
-                        Text(endSummary)
-                            .font(.system(size: 12))
-                            .foregroundStyle(Theme.secondaryText)
-                    }
-                }
-                .listRowBackground(Theme.card)
-            }
-
-            if isEditing {
+            if isEditing, !isReadOnly {
                 Section {
                     Button("Delete expense", role: .destructive) {
                         isConfirmingDelete = true
@@ -223,6 +242,7 @@ struct ExpenseFormView: View {
                 .listRowBackground(Theme.card)
             }
         }
+        .disabled(isReadOnly)
         .scrollContentBackground(.hidden)
         .scrollDismissesKeyboard(.interactively)
         .contentMargins(.top, 0, for: .scrollContent)
@@ -230,15 +250,21 @@ struct ExpenseFormView: View {
         .toolbar(.hidden, for: .tabBar)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            if showsCancelButton {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+            if isReadOnly {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Edit") { isReadOnly = false }
                 }
-            }
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Save") { save() }
-                    .fontWeight(.semibold)
-                    .disabled(!canSave)
+            } else {
+                if showsCancelButton {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") { dismiss() }
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") { save() }
+                        .fontWeight(.semibold)
+                        .disabled(!canSave)
+                }
             }
         }
         .confirmationDialog(
@@ -270,7 +296,10 @@ struct ExpenseFormView: View {
         }
     }
 
-    private func draft(amount: Decimal) -> FixedExpense {
+}
+
+extension ExpenseFormView {
+    fileprivate func draft(amount: Decimal) -> FixedExpense {
         FixedExpense(
             name: name,
             amount: amount,
@@ -286,7 +315,7 @@ struct ExpenseFormView: View {
         )
     }
 
-    private func save() {
+    fileprivate func save() {
         guard let amount else { return }
         let trimmedName = name.trimmingCharacters(in: .whitespaces)
 
@@ -311,7 +340,7 @@ struct ExpenseFormView: View {
         dismiss()
     }
 
-    private func delete() {
+    fileprivate func delete() {
         if let expense {
             modelContext.delete(expense)
         }

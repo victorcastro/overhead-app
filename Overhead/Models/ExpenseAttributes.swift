@@ -45,6 +45,18 @@ enum ExpenseCategory: String, Codable, CaseIterable, Identifiable {
         case .transport: "Transport"
         }
     }
+
+    var sfSymbol: String {
+        switch self {
+        case .housing: "house.fill"
+        case .insurance: "shield.fill"
+        case .taxes: "percent"
+        case .utilities: "bolt.fill"
+        case .subscriptions: "arrow.triangle.2.circlepath"
+        case .education: "graduationcap.fill"
+        case .transport: "car.fill"
+        }
+    }
 }
 
 enum LocationFilter: Hashable, Identifiable {

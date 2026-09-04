@@ -37,6 +37,7 @@ struct CloudSettingsView: View {
         .background(Theme.background)
         .navigationTitle("iCloud")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
         .confirmationDialog(
             "Delete the iCloud copy of your data?",
             isPresented: $isEraseConfirmationPresented,

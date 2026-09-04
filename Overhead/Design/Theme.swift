@@ -8,6 +8,7 @@ enum Theme {
     static let accent = Color(red: 10 / 255, green: 132 / 255, blue: 255 / 255)
     static let positive = Color(red: 48 / 255, green: 209 / 255, blue: 88 / 255)
     static let destructive = Color(red: 255 / 255, green: 69 / 255, blue: 58 / 255)
+    static let warning = Color(red: 255 / 255, green: 214 / 255, blue: 10 / 255)
 
     private static let label = Color(red: 235 / 255, green: 235 / 255, blue: 245 / 255)
     static let primaryText = Color.white
@@ -28,15 +29,22 @@ extension View {
 
 struct SectionHeader: View {
     let title: String
+    var icon: String?
 
     var body: some View {
-        Text(title.uppercased())
-            .font(.system(size: 13, weight: .semibold))
-            .kerning(0.4)
-            .foregroundStyle(Theme.headerText)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 4)
-            .padding(.bottom, 8)
+        HStack(spacing: 6) {
+            if let icon {
+                Image(systemName: icon)
+                    .font(.system(size: 12, weight: .semibold))
+            }
+            Text(title.uppercased())
+                .font(.system(size: 13, weight: .semibold))
+                .kerning(0.4)
+        }
+        .foregroundStyle(Theme.headerText)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 4)
+        .padding(.bottom, 8)
     }
 }
 
