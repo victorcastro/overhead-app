@@ -85,6 +85,16 @@ jobs:
           fetch-depth: 1
           persist-credentials: false
 
+      - name: Install SwiftLint
+        env:
+          SWIFTLINT_VERSION: "0.63.2"
+        run: |
+          curl --fail --location --silent --show-error \
+            --output "$RUNNER_TEMP/swiftlint.zip" \
+            "https://github.com/realm/SwiftLint/releases/download/$SWIFTLINT_VERSION/portable_swiftlint.zip"
+          unzip -q -o "$RUNNER_TEMP/swiftlint.zip" -d "$RUNNER_TEMP/swiftlint"
+          sudo install -m 0755 "$RUNNER_TEMP/swiftlint/swiftlint" /usr/local/bin/swiftlint
+
       - name: Verify toolchain
         run: |
           xcodebuild -version
