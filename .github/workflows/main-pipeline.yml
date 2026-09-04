@@ -21,9 +21,6 @@ concurrency:
   group: ios-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
-env:
-  DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
-
 jobs:
   version-and-changelog:
     name: Version and changelog
@@ -78,7 +75,7 @@ jobs:
   build-and-test:
     name: Build and unit tests
     needs: version-and-changelog
-    runs-on: macos-15-intel
+    runs-on: macos-26
     timeout-minutes: 20
 
     steps:
@@ -87,6 +84,16 @@ jobs:
         with:
           fetch-depth: 1
           persist-credentials: false
+
+      - name: Install SwiftLint
+        env:
+          SWIFTLINT_VERSION: "0.63.2"
+        run: |
+          curl --fail --location --silent --show-error \
+            --output "$RUNNER_TEMP/swiftlint.zip" \
+            "https://github.com/realm/SwiftLint/releases/download/$SWIFTLINT_VERSION/portable_swiftlint.zip"
+          unzip -q -o "$RUNNER_TEMP/swiftlint.zip" -d "$RUNNER_TEMP/swiftlint"
+          sudo install -m 0755 "$RUNNER_TEMP/swiftlint/swiftlint" /usr/local/bin/swiftlint
 
       - name: Verify toolchain
         run: |
@@ -99,7 +106,7 @@ jobs:
             -project SinkingFound.xcodeproj \
             -scheme SinkingFound \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+            -destination 'platform=iOS Simulator,name=iPhone 17' \
             -derivedDataPath "$RUNNER_TEMP/DerivedData" \
             -resultBundlePath "$RUNNER_TEMP/SinkingFoundTests.xcresult" \
             -only-testing:SinkingFoundTests \

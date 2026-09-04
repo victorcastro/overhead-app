@@ -18,6 +18,7 @@ struct SinkingFoundApp: App {
         WindowGroup {
             RootTabView()
                 .environment(settings)
+                .environment(\.moneyFormat, MoneyFormat(decimals: settings.decimalPlaces))
                 .onChange(of: settings.iCloudSyncEnabled) { _, enabled in
                     container = ExpenseStore.makeContainer(cloudSyncEnabled: enabled)
                 }

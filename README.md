@@ -50,25 +50,44 @@ connection. Syncing across devices is available through the user's own iCloud, a
 
 ### Monthly dashboard
 
-The Home tab calculates a plan for the current month and groups expenses into:
+The Home tab calculates a plan for the selected month and groups expenses into:
 
 | Section | Purpose |
 | --- | --- |
 | Still to set aside | Unpaid expenses plus the monthly share of future annual costs |
-| Unpaid | Expenses due during the current month that are not marked as paid |
+| Unpaid | Expenses due during the selected month that are not marked as paid |
 | Paid | Completed expenses for that monthly period |
 | Saving ahead | Monthly contributions toward annual expenses due later |
 
+A recurring expense can end: never, after a number of payments counting the first one, or on a date it may not fall
+past. One-time expenses have no end rule. A series that has ended disappears from later months, from the annual totals
+and from the share saved ahead, and its final payment reads "last payment" in the list.
+
+It opens on the current month. Swiping left or right moves one month at a time, and the calendar button in the
+navigation bar opens a picker with the twelve months of a year. Both cover the same window, from the current year minus
+one to the current year plus one, and the picker adds a shortcut back to this month.
+Marking an expense as paid records the month you are looking at, and adding a new expense always anchors it to the real
+current month.
+
 ### Annual calendar
 
-The Calendar tab shows one card per month of a year, navigable with the chevrons beside the year. Each card shows that
-month's fixed-cost total, a bar scaled against the year's heaviest month, and a color comparing it to the year's monthly
-average: normal up to 110%, above average up to 150%, heavy beyond that. It reads every expense, so the dashboard's
-location filter does not narrow these totals.
+The Calendar tab shows one card per month of a year, named in the navigation bar. It opens on the current year. Each
+card shows that month's fixed-cost total, a bar scaled against the year's heaviest month, and a color comparing
+it to the year's monthly average: normal up to 110%, above average up to 150%, heavy beyond that. It reads every
+expense, so the dashboard's location filter does not narrow these totals.
+
+Swiping left or right moves one year at a time. The range comes from the data: back to the oldest year holding a
+payment and forward to the last one, capped five years ahead so an expense without an end date does not open an endless
+range. Years with nothing in them sit inside that range and can still be swiped through, and a "This year" button sits
+next to the title while the year on screen is not the current one.
+
+Tapping a card opens a read-only summary of that month: its total plus the expenses split into unpaid, paid and saving
+ahead. Marking as paid and editing stay on Home.
 
 ### Settings
 
-The Settings tab holds the base currency, the tracked locations, the reference exchange rates, and the iCloud controls.
+The Settings tab holds the base currency, the number of decimals shown on every amount, the tracked locations, the
+reference exchange rates, and the iCloud controls.
 Deleting a location moves the expenses that used it back to Undefined; with no locations defined, the dashboard filter
 and the expense form's location picker stay hidden.
 
@@ -83,8 +102,8 @@ When a due day does not exist in a target month, SinkingFound uses that month's 
 
 ## Requirements
 
-- macOS with Xcode 16 or later
-- iOS 18.0 or later
+- macOS with Xcode 26 or later
+- iOS 26.0 or later
 - SwiftLint, when running the repository's lint command locally
 
 The project has no third-party runtime dependencies and does not require dependency installation.
@@ -93,7 +112,7 @@ The project has no third-party runtime dependencies and does not require depende
 
 1. Clone or fork this repository.
 2. Open `SinkingFound.xcodeproj` in Xcode.
-3. Select the `SinkingFound` scheme and an iOS 18+ simulator or device.
+3. Select the `SinkingFound` scheme and an iOS 26+ simulator or device.
 4. Build and run with <kbd>⌘</kbd><kbd>R</kbd>.
 
 You can also build from the command line:
@@ -113,7 +132,7 @@ Run the test suite with a simulator available on your machine:
 xcodebuild test \
   -project SinkingFound.xcodeproj \
   -scheme SinkingFound \
-  -destination 'platform=iOS Simulator,name=iPhone 16'
+  -destination 'platform=iOS Simulator,name=iPhone 17'
 ```
 
 Run lint checks separately with:
@@ -130,19 +149,21 @@ SinkingFound/
 │   └── Theme.swift                  # Shared colors, spacing, and card styling
 ├── Features/
 │   ├── Calendar/
-│   │   └── CalendarView.swift       # Twelve-month expense overview
+│   │   ├── CalendarView.swift       # Twelve-month expense overview, one page per year
+│   │   └── MonthDetailSheet.swift   # Read-only breakdown of a single month
 │   ├── Dashboard/
 │   │   ├── DashboardComponents.swift
-│   │   └── DashboardView.swift      # Home screen for the current month
+│   │   ├── DashboardView.swift      # Home screen for the selected month
+│   │   └── MonthPickerSheet.swift   # Month picker opened from the Home toolbar
 │   ├── ExpenseForm/
 │   │   └── ExpenseFormView.swift    # Create, edit, and delete expenses
 │   ├── Root/
 │   │   └── RootTabView.swift        # Home, Calendar, and Settings tabs
 │   └── Settings/
 │       ├── LocationSettingsView.swift
-│       └── SettingsView.swift       # iCloud, base currency, locations, exchange rates
+│       └── SettingsView.swift       # iCloud, base currency, decimals, locations, exchange rates
 ├── Models/
-│   ├── AppSettings.swift            # Base currency, locations, and the iCloud sync flag
+│   ├── AppSettings.swift            # Base currency, decimals, locations, and the iCloud sync flag
 │   ├── CloudDataEraser.swift        # Deletes this app's data from the private iCloud database
 │   ├── Currency.swift               # Currency metadata and money formatting
 │   ├── ExpenseAttributes.swift      # Frequency, category, and location types
@@ -150,7 +171,9 @@ SinkingFound/
 │   ├── FixedExpense.swift           # SwiftData persistence model
 │   ├── KeyValueStore.swift          # Testable seam over NSUbiquitousKeyValueStore
 │   ├── Location.swift               # Country catalog
-│   └── MonthPlan.swift              # Monthly planning calculations
+│   ├── MonthPlan.swift              # Monthly planning calculations
+│   ├── MonthWindow.swift            # The range of months Home can reach
+│   └── YearWindow.swift             # The range of years the calendar can reach
 ├── SinkingFound.entitlements        # iCloud container, CloudKit, and key-value store
 └── SinkingFoundApp.swift            # App entry point and model container
 ```
@@ -162,7 +185,7 @@ SwiftUI views inside feature folders. This separation makes the financial rules 
 
 - Expense data is persisted locally using SwiftData.
 - iCloud sync is off by default and only runs when it is turned on in Settings. When enabled, the expenses go to the
-  user's private CloudKit database and the base currency and locations go to `NSUbiquitousKeyValueStore`; nothing leaves
+  user's private CloudKit database and the base currency, decimals, and locations go to `NSUbiquitousKeyValueStore`; nothing leaves
   the user's own iCloud account. Turning it off stops syncing without deleting anything on either side.
 - Settings has a separate, explicit action to delete this app's data from iCloud. It never runs as a side effect of
   turning sync off.

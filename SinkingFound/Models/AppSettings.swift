@@ -3,6 +3,13 @@ import Observation
 
 @Observable
 final class AppSettings {
+    static let baseCurrencyKey = "baseCurrency"
+    static let locationCodesKey = "locationCodes"
+    static let decimalPlacesKey = "decimalPlaces"
+    private static let iCloudSyncEnabledKey = "iCloudSyncEnabled"
+    static let defaultDecimalPlaces = 2
+    static let decimalPlacesOptions = Array(0...4)
+
     var baseCurrency: Currency {
         didSet {
             defaults.set(baseCurrency.rawValue, forKey: Self.baseCurrencyKey)
@@ -23,18 +30,25 @@ final class AppSettings {
             guard iCloudSyncEnabled else { return }
             mirrorToCloud(baseCurrency.rawValue, forKey: Self.baseCurrencyKey)
             mirrorToCloud(locationCodes, forKey: Self.locationCodesKey)
+            mirrorToCloud(decimalPlaces, forKey: Self.decimalPlacesKey)
+        }
+    }
+
+    var decimalPlaces: Int {
+        didSet {
+            decimalPlaces = Self.clampedDecimalPlaces(decimalPlaces)
+            guard decimalPlaces != oldValue else { return }
+            defaults.set(decimalPlaces, forKey: Self.decimalPlacesKey)
+            mirrorToCloud(decimalPlaces, forKey: Self.decimalPlacesKey)
         }
     }
 
     var hasLocations: Bool { !locationCodes.isEmpty }
+    var hasMultipleLocations: Bool { locationCodes.count > 1 }
 
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let ubiquitous: KeyValueStore
     @ObservationIgnored private var externalChangeObserver: (any NSObjectProtocol)?
-
-    static let baseCurrencyKey = "baseCurrency"
-    static let locationCodesKey = "locationCodes"
-    private static let iCloudSyncEnabledKey = "iCloudSyncEnabled"
 
     init(
         defaults: UserDefaults = .standard,
@@ -57,6 +71,12 @@ final class AppSettings {
         let cloudCodes = syncEnabled ? ubiquitous.array(forKey: Self.locationCodesKey) as? [String] : nil
         locationCodes = cloudCodes ?? defaults.stringArray(forKey: Self.locationCodesKey) ?? []
 
+        let cloudDecimals = syncEnabled ? ubiquitous.object(forKey: Self.decimalPlacesKey) as? Int : nil
+        let storedDecimals = defaults.object(forKey: Self.decimalPlacesKey) as? Int
+        decimalPlaces = Self.clampedDecimalPlaces(
+            cloudDecimals ?? storedDecimals ?? Self.defaultDecimalPlaces
+        )
+
         observeExternalChanges()
     }
 
@@ -66,15 +86,21 @@ final class AppSettings {
         }
     }
 
-    private func mirrorToCloud(_ value: Any, forKey key: String) {
-        guard iCloudSyncEnabled else { return }
-        ubiquitous.set(value, forKey: key)
-        ubiquitous.synchronize()
+    static func clampedDecimalPlaces(_ value: Int) -> Int {
+        guard let first = decimalPlacesOptions.first, let last = decimalPlacesOptions.last else { return value }
+        return min(max(value, first), last)
     }
 
     func clearCloudMirror() {
         ubiquitous.removeObject(forKey: Self.baseCurrencyKey)
         ubiquitous.removeObject(forKey: Self.locationCodesKey)
+        ubiquitous.removeObject(forKey: Self.decimalPlacesKey)
+        ubiquitous.synchronize()
+    }
+
+    private func mirrorToCloud(_ value: Any, forKey key: String) {
+        guard iCloudSyncEnabled else { return }
+        ubiquitous.set(value, forKey: key)
         ubiquitous.synchronize()
     }
 
@@ -103,6 +129,11 @@ final class AppSettings {
         if let codes = ubiquitous.array(forKey: Self.locationCodesKey) as? [String],
            codes != locationCodes {
             locationCodes = codes
+        }
+
+        if let decimals = ubiquitous.object(forKey: Self.decimalPlacesKey) as? Int,
+           Self.clampedDecimalPlaces(decimals) != decimalPlaces {
+            decimalPlaces = decimals
         }
     }
 }

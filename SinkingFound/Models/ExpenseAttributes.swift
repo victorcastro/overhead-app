@@ -15,6 +15,20 @@ enum ExpenseFrequency: String, Codable, CaseIterable, Identifiable {
     }
 }
 
+enum ExpenseEndRule: String, Codable, CaseIterable, Identifiable {
+    case never, afterOccurrences, onDate
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .never: "Never"
+        case .afterOccurrences: "After"
+        case .onDate: "On date"
+        }
+    }
+}
+
 enum ExpenseCategory: String, Codable, CaseIterable, Identifiable {
     case housing, insurance, taxes, utilities, subscriptions, education, transport
 
