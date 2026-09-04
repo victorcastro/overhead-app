@@ -4,10 +4,10 @@ on:
   push:
     branches: [main]
     paths:
-      - "SinkingFound/**"
-      - "SinkingFoundTests/**"
-      - "SinkingFoundUITests/**"
-      - "SinkingFound.xcodeproj/**"
+      - "Overhead/**"
+      - "OverheadTests/**"
+      - "OverheadUITests/**"
+      - "Overhead.xcodeproj/**"
       - "CHANGELOG.md"
       - ".swiftlint.yml"
       - ".github/workflows/pull-request.yml"
@@ -42,7 +42,7 @@ jobs:
         run: |
           versions="$(
             sed -nE 's/^[[:space:]]*MARKETING_VERSION = ([^;]+);/\1/p' \
-              SinkingFound.xcodeproj/project.pbxproj | sort -u
+              Overhead.xcodeproj/project.pbxproj | sort -u
           )"
           version_count="$(printf '%s\n' "$versions" | sed '/^$/d' | wc -l | tr -d ' ')"
 
@@ -103,13 +103,13 @@ jobs:
       - name: Build, lint, and run unit tests
         run: |
           xcodebuild test \
-            -project SinkingFound.xcodeproj \
-            -scheme SinkingFound \
+            -project Overhead.xcodeproj \
+            -scheme Overhead \
             -configuration Debug \
             -destination 'platform=iOS Simulator,name=iPhone 17' \
             -derivedDataPath "$RUNNER_TEMP/DerivedData" \
-            -resultBundlePath "$RUNNER_TEMP/SinkingFoundTests.xcresult" \
-            -only-testing:SinkingFoundTests \
+            -resultBundlePath "$RUNNER_TEMP/OverheadTests.xcresult" \
+            -only-testing:OverheadTests \
             -quiet \
             CODE_SIGNING_ALLOWED=NO \
             COMPILER_INDEX_STORE_ENABLE=NO
@@ -119,7 +119,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ios-ci-diagnostics-${{ github.run_id }}
-          path: ${{ runner.temp }}/SinkingFoundTests.xcresult
+          path: ${{ runner.temp }}/OverheadTests.xcresult
           if-no-files-found: ignore
           retention-days: 7
 

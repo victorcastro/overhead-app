@@ -1,0 +1,584 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 100;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		CC3990F5304862E000420738 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CC3990DD304862DF00420738 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CC3990E4304862DF00420738;
+			remoteInfo = Overhead;
+		};
+		CC3990FF304862E000420738 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CC3990DD304862DF00420738 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CC3990E4304862DF00420738;
+			remoteInfo = Overhead;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		CC3990E5304862DF00420738 /* Overhead.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Overhead.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC3990F4304862E000420738 /* OverheadTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OverheadTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC3990FE304862E000420738 /* OverheadUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OverheadUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC63D8273048B1DE00B1BC90 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		CC63D8303048BDA900B1BC90 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		CC3990E7304862DF00420738 /* Overhead */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Overhead;
+			sourceTree = "<group>";
+		};
+		CC3990F7304862E000420738 /* OverheadTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = OverheadTests;
+			sourceTree = "<group>";
+		};
+		CC399101304862E000420738 /* OverheadUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = OverheadUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CC3990E2304862DF00420738 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		CC3990F1304862E000420738 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		CC3990FB304862E000420738 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		CC3990DC304862DF00420738 = {
+			isa = PBXGroup;
+			children = (
+				CC63D8273048B1DE00B1BC90 /* README.md */,
+				CC63D8303048BDA900B1BC90 /* CHANGELOG.md */,
+				CC3990E7304862DF00420738 /* Overhead */,
+				CC3990F7304862E000420738 /* OverheadTests */,
+				CC399101304862E000420738 /* OverheadUITests */,
+				CC3990E6304862DF00420738 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CC3990E6304862DF00420738 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CC3990E5304862DF00420738 /* Overhead.app */,
+				CC3990F4304862E000420738 /* OverheadTests.xctest */,
+				CC3990FE304862E000420738 /* OverheadUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CC3990E4304862DF00420738 /* Overhead */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC399108304862E000420738 /* Build configuration list for PBXNativeTarget "Overhead" */;
+			buildPhases = (
+				A1000001304862DF00420738 /* SwiftLint */,
+				CC3990E1304862DF00420738 /* Sources */,
+				CC3990E2304862DF00420738 /* Frameworks */,
+				CC3990E3304862DF00420738 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				CC3990E7304862DF00420738 /* Overhead */,
+			);
+			name = Overhead;
+			productName = Overhead;
+			productReference = CC3990E5304862DF00420738 /* Overhead.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CC3990F3304862E000420738 /* OverheadTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC39910B304862E000420738 /* Build configuration list for PBXNativeTarget "OverheadTests" */;
+			buildPhases = (
+				CC3990F0304862E000420738 /* Sources */,
+				CC3990F1304862E000420738 /* Frameworks */,
+				CC3990F2304862E000420738 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CC3990F6304862E000420738 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				CC3990F7304862E000420738 /* OverheadTests */,
+			);
+			name = OverheadTests;
+			productName = OverheadTests;
+			productReference = CC3990F4304862E000420738 /* OverheadTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		CC3990FD304862E000420738 /* OverheadUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC39910E304862E000420738 /* Build configuration list for PBXNativeTarget "OverheadUITests" */;
+			buildPhases = (
+				CC3990FA304862E000420738 /* Sources */,
+				CC3990FB304862E000420738 /* Frameworks */,
+				CC3990FC304862E000420738 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CC399100304862E000420738 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				CC399101304862E000420738 /* OverheadUITests */,
+			);
+			name = OverheadUITests;
+			productName = OverheadUITests;
+			productReference = CC3990FE304862E000420738 /* OverheadUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CC3990DD304862DF00420738 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2660;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					CC3990E4304862DF00420738 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					CC3990F3304862E000420738 = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = CC3990E4304862DF00420738;
+					};
+					CC3990FD304862E000420738 = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = CC3990E4304862DF00420738;
+					};
+				};
+			};
+			buildConfigurationList = CC3990E0304862DF00420738 /* Build configuration list for PBXProject "Overhead" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = CC3990DC304862DF00420738;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 100;
+			productRefGroup = CC3990E6304862DF00420738 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CC3990E4304862DF00420738 /* Overhead */,
+				CC3990F3304862E000420738 /* OverheadTests */,
+				CC3990FD304862E000420738 /* OverheadUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CC3990E3304862DF00420738 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		CC3990F2304862E000420738 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		CC3990FC304862E000420738 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A1000001304862DF00420738 /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			name = SwiftLint;
+			shellPath = /bin/sh;
+			shellScript = (
+				"export PATH=\"/opt/homebrew/bin:/usr/local/bin:$PATH\"",
+				"if command -v swiftlint >/dev/null; then",
+				"    swiftlint lint --strict --no-cache --config \"$SRCROOT/.swiftlint.yml\"",
+				"else",
+				"    echo \"error: SwiftLint is not installed. Run: brew install swiftlint\"",
+				"    exit 1",
+				"fi",
+				"",
+			);
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CC3990E1304862DF00420738 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		CC3990F0304862E000420738 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		CC3990FA304862E000420738 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CC3990F6304862E000420738 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CC3990E4304862DF00420738 /* Overhead */;
+			targetProxy = CC3990F5304862E000420738 /* PBXContainerItemProxy */;
+		};
+		CC399100304862E000420738 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CC3990E4304862DF00420738 /* Overhead */;
+			targetProxy = CC3990FF304862E000420738 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		CC399106304862E000420738 /* Debug configuration for PBXProject "Overhead" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 4G9UQ8D789;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CC399107304862E000420738 /* Release configuration for PBXProject "Overhead" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 4G9UQ8D789;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		CC399109304862E000420738 /* Debug configuration for PBXNativeTarget "Overhead" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Overhead/Overhead.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4G9UQ8D789;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Overhead;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_UIBackgroundModes = "remote-notification";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.victorcastro.Overhead;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CC39910A304862E000420738 /* Release configuration for PBXNativeTarget "Overhead" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Overhead/Overhead.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4G9UQ8D789;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Overhead;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_UIBackgroundModes = "remote-notification";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.victorcastro.Overhead;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		CC39910C304862E000420738 /* Debug configuration for PBXNativeTarget "OverheadTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4G9UQ8D789;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.victorcastro.OverheadTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Overhead.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Overhead";
+			};
+			name = Debug;
+		};
+		CC39910D304862E000420738 /* Release configuration for PBXNativeTarget "OverheadTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4G9UQ8D789;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.victorcastro.OverheadTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Overhead.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Overhead";
+			};
+			name = Release;
+		};
+		CC39910F304862E000420738 /* Debug configuration for PBXNativeTarget "OverheadUITests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4G9UQ8D789;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.victorcastro.OverheadUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = Overhead;
+			};
+			name = Debug;
+		};
+		CC399110304862E000420738 /* Release configuration for PBXNativeTarget "OverheadUITests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4G9UQ8D789;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.3.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.victorcastro.OverheadUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = Overhead;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CC3990E0304862DF00420738 /* Build configuration list for PBXProject "Overhead" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC399106304862E000420738 /* Debug configuration for PBXProject "Overhead" */,
+				CC399107304862E000420738 /* Release configuration for PBXProject "Overhead" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		CC399108304862E000420738 /* Build configuration list for PBXNativeTarget "Overhead" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC399109304862E000420738 /* Debug configuration for PBXNativeTarget "Overhead" */,
+				CC39910A304862E000420738 /* Release configuration for PBXNativeTarget "Overhead" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		CC39910B304862E000420738 /* Build configuration list for PBXNativeTarget "OverheadTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC39910C304862E000420738 /* Debug configuration for PBXNativeTarget "OverheadTests" */,
+				CC39910D304862E000420738 /* Release configuration for PBXNativeTarget "OverheadTests" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		CC39910E304862E000420738 /* Build configuration list for PBXNativeTarget "OverheadUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC39910F304862E000420738 /* Debug configuration for PBXNativeTarget "OverheadUITests" */,
+				CC399110304862E000420738 /* Release configuration for PBXNativeTarget "OverheadUITests" */,
+			);
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CC3990DD304862DF00420738 /* Project object */;
+}
