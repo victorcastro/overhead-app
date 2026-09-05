@@ -1,6 +1,11 @@
 import SwiftUI
 import SwiftData
 
+private struct PendingPaidUndo {
+    let expense: FixedExpense
+    let month: Date
+}
+
 enum DashboardSheet: Identifiable {
     case editExpense(FixedExpense)
     case monthPicker
@@ -25,6 +30,7 @@ struct DashboardView: View {
     @State private var activeSheet: DashboardSheet?
     @State private var isAddingExpense = false
     @State private var selectedMonth = MonthWindow.currentMonth()
+    @State private var pendingPaidUndo: PendingPaidUndo?
 
     private let currentMonth = MonthWindow.currentMonth()
     private let availableMonths = MonthWindow.months()
@@ -120,8 +126,18 @@ struct DashboardView: View {
                     MonthPickerSheet(selection: $selectedMonth)
                 }
             }
+            .overlay(alignment: .bottom) {
+                if let pendingPaidUndo {
+                    UndoPaidBadge(expenseName: pendingPaidUndo.expense.name) {
+                        undoPaid(pendingPaidUndo)
+                    }
+                    .padding(.bottom, 8)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
             .onChange(of: selectedMonth) {
                 isPaidExpanded = false
+                pendingPaidUndo = nil
             }
             .onChange(of: settings.locationCodes) {
                 if !settings.hasMultipleLocations {
@@ -195,8 +211,17 @@ struct DashboardView: View {
     }
 
     private func togglePaid(_ occurrence: ExpenseOccurrence, in month: Date) {
+        let willBePaid = !occurrence.isPaid
         withAnimation(.easeInOut(duration: 0.2)) {
-            occurrence.expense.setPaid(!occurrence.isPaid, in: month)
+            occurrence.expense.setPaid(willBePaid, in: month)
+            pendingPaidUndo = willBePaid ? PendingPaidUndo(expense: occurrence.expense, month: month) : nil
+        }
+    }
+
+    private func undoPaid(_ pending: PendingPaidUndo) {
+        withAnimation(.easeInOut(duration: 0.2)) {
+            pending.expense.setPaid(false, in: pending.month)
+            pendingPaidUndo = nil
         }
     }
 }
