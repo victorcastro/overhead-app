@@ -1,6 +1,11 @@
 import SwiftUI
 import SwiftData
 
+private struct PendingPaidUndo {
+    let expense: FixedExpense
+    let month: Date
+}
+
 enum DashboardSheet: Identifiable {
     case editExpense(FixedExpense)
     case monthPicker
@@ -25,6 +30,9 @@ struct DashboardView: View {
     @State private var activeSheet: DashboardSheet?
     @State private var isAddingExpense = false
     @State private var selectedMonth = MonthWindow.currentMonth()
+    @State private var pendingPaidUndo: PendingPaidUndo?
+    @State private var isSummaryCollapsed = false
+    @State private var summaryCardHeight: CGFloat = 170
 
     private let currentMonth = MonthWindow.currentMonth()
     private let availableMonths = MonthWindow.months()
@@ -59,15 +67,29 @@ struct DashboardView: View {
         selectedMonth.formatted(.dateTime.year())
     }
 
+    private var monthScrollPosition: Binding<Date?> {
+        Binding {
+            selectedMonth
+        } set: { newValue in
+            guard let newValue, newValue != selectedMonth else { return }
+            selectedMonth = newValue
+        }
+    }
+
     var body: some View {
         NavigationStack {
-            TabView(selection: $selectedMonth) {
-                ForEach(availableMonths, id: \.self) { month in
-                    monthPage(month)
-                        .tag(month)
+            ScrollView(.horizontal) {
+                LazyHStack(spacing: 0) {
+                    ForEach(availableMonths, id: \.self) { month in
+                        monthPage(month)
+                            .containerRelativeFrame(.horizontal)
+                    }
                 }
+                .scrollTargetLayout()
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
+            .scrollTargetBehavior(.paging)
+            .scrollPosition(id: monthScrollPosition)
+            .scrollIndicators(.hidden)
             .background(Theme.background)
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle(monthNameTitle)
@@ -106,8 +128,25 @@ struct DashboardView: View {
                     MonthPickerSheet(selection: $selectedMonth)
                 }
             }
+            .overlay(alignment: .bottom) {
+                if let pendingPaidUndo {
+                    UndoPaidBadge(expenseName: pendingPaidUndo.expense.name) {
+                        undoPaid(pendingPaidUndo)
+                    }
+                    .padding(.bottom, 8)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
+            .overlay(alignment: .top) {
+                if isSummaryCollapsed {
+                    CompactMonthSummaryBar(plan: plan(for: selectedMonth))
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
+            }
             .onChange(of: selectedMonth) {
                 isPaidExpanded = false
+                pendingPaidUndo = nil
+                isSummaryCollapsed = false
             }
             .onChange(of: settings.locationCodes) {
                 if !settings.hasMultipleLocations {
@@ -133,6 +172,17 @@ struct DashboardView: View {
         }
         .background(Theme.background)
         .scrollIndicators(.hidden)
+        .onScrollGeometryChange(for: CGFloat.self) { geometry in
+            geometry.contentOffset.y
+        } action: { _, offset in
+            guard month == selectedMonth else { return }
+            let shouldCollapse = offset > summaryCardHeight + 8
+            if shouldCollapse != isSummaryCollapsed {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    isSummaryCollapsed = shouldCollapse
+                }
+            }
+        }
     }
 
     @ViewBuilder
@@ -142,6 +192,12 @@ struct DashboardView: View {
         VStack(spacing: 0) {
             MonthSummaryCard(plan: plan, monthName: monthTitle(for: month), isCurrentMonth: month == currentMonth)
                 .padding(.bottom, 16)
+                .onGeometryChange(for: CGFloat.self) { proxy in
+                    proxy.size.height
+                } action: { newValue in
+                    guard month == selectedMonth else { return }
+                    summaryCardHeight = newValue
+                }
 
             if settings.hasMultipleLocations {
                 LocationFilterPills(codes: settings.locationCodes, selection: $filter)
@@ -181,8 +237,17 @@ struct DashboardView: View {
     }
 
     private func togglePaid(_ occurrence: ExpenseOccurrence, in month: Date) {
+        let willBePaid = !occurrence.isPaid
         withAnimation(.easeInOut(duration: 0.2)) {
-            occurrence.expense.setPaid(!occurrence.isPaid, in: month)
+            occurrence.expense.setPaid(willBePaid, in: month)
+            pendingPaidUndo = willBePaid ? PendingPaidUndo(expense: occurrence.expense, month: month) : nil
+        }
+    }
+
+    private func undoPaid(_ pending: PendingPaidUndo) {
+        withAnimation(.easeInOut(duration: 0.2)) {
+            pending.expense.setPaid(false, in: pending.month)
+            pendingPaidUndo = nil
         }
     }
 }

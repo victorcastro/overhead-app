@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overhead — Know what is due, what is paid, and what to set aside next</title>
+  <meta name="description" content="Overhead is a private, local-first iOS app for planning recurring expenses across months, currencies, and countries, with optional iCloud sync. Open source." />
+  <link rel="icon" href="assets/icon.png" />
+  <link rel="apple-touch-icon" href="assets/icon.png" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+
+  <nav>
+    <div class="wrap">
+      <a class="brand" href="index.html">
+        <img src="assets/icon.png" alt="" />
+        Overhead
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#privacy">Privacy</a>
+        <a href="https://github.com/victorcastro/overhead-app">GitHub</a>
+        <a href="support.html">Support</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="wrap">
+      <img class="app-icon" src="assets/icon.png" alt="Overhead app icon" />
+      <h1>Know what is due, what is paid,<br />and what to set aside next.</h1>
+      <p class="tagline">
+        A private, local-first iOS app for planning recurring expenses across
+        months, currencies, and countries — with optional iCloud sync.
+      </p>
+      <div class="badges">
+        <img src="https://img.shields.io/badge/platform-iOS%2026%2B-000000?style=flat-square&logo=apple" alt="iOS 26+" />
+        <img src="https://img.shields.io/badge/Swift-5.0-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 5.0" />
+        <img src="https://img.shields.io/badge/license-MIT-3DA639?style=flat-square" alt="MIT License" />
+      </div>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/victorcastro/overhead-app">View on GitHub</a>
+        <a class="btn btn-secondary" href="support.html">Support</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="screens">
+    <img src="screenshots/home-dashboard.png" alt="Monthly dashboard screen" loading="lazy" />
+    <img src="screenshots/annual-calendar.png" alt="Annual calendar screen" loading="lazy" />
+    <img src="screenshots/expense-form.png" alt="Expense form screen" loading="lazy" />
+  </div>
+
+  <section class="features" id="features">
+    <div class="wrap">
+      <h2 class="section-title">How it works</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Home</h3>
+          <p>
+            Shows the selected month split into still to set aside, unpaid,
+            paid, and saving ahead for future annual costs. Swipe to change
+            month, from last year to next.
+          </p>
+        </div>
+        <div class="feature-card">
+          <h3>Calendar</h3>
+          <p>
+            One card per month, colored against the year's average, with a
+            read-only breakdown on tap. Swipe to change year, within the
+            range your data covers.
+          </p>
+        </div>
+        <div class="feature-card">
+          <h3>Settings</h3>
+          <p>
+            Base currency, decimals, tracked locations, exchange rates, and
+            iCloud controls — all in one place.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="privacy" id="privacy">
+    <div class="wrap">
+      <div class="privacy-card">
+        <h2>Your data stays yours</h2>
+        <p>
+          All expense data is stored locally on the device using SwiftData —
+          no account and no network connection required. iCloud sync is off
+          by default and, when enabled, stays inside your own private iCloud
+          account. There is no analytics and no remote backend beyond your
+          own iCloud.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <p>© 2026 Victor Castro. Open source under the MIT License.</p>
+      <div class="links">
+        <a href="https://github.com/victorcastro/overhead-app">GitHub</a>
+        <a href="https://github.com/victorcastro/overhead-app/blob/main/LICENSE">License</a>
+        <a href="support.html">Support</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
