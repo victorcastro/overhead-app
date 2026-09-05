@@ -67,11 +67,14 @@ struct CalendarView: View {
             .toolbar {
                 if !isOnCurrentYear {
                     ToolbarItem(placement: .topBarTrailing) {
-                        Button("This year") {
+                        Button {
                             withAnimation(.easeInOut(duration: 0.25)) {
                                 displayedYear = currentYear
                             }
+                        } label: {
+                            Image(systemName: "clock.arrow.circlepath")
                         }
+                        .tint(Theme.primaryText)
                         .accessibilityLabel("Go back to this year")
                     }
                 }

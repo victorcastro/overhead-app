@@ -31,6 +31,8 @@ struct DashboardView: View {
     @State private var isAddingExpense = false
     @State private var selectedMonth = MonthWindow.currentMonth()
     @State private var pendingPaidUndo: PendingPaidUndo?
+    @State private var isSummaryCollapsed = false
+    @State private var summaryCardHeight: CGFloat = 170
 
     private let currentMonth = MonthWindow.currentMonth()
     private let availableMonths = MonthWindow.months()
@@ -135,9 +137,16 @@ struct DashboardView: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
+            .overlay(alignment: .top) {
+                if isSummaryCollapsed {
+                    CompactMonthSummaryBar(plan: plan(for: selectedMonth))
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
+            }
             .onChange(of: selectedMonth) {
                 isPaidExpanded = false
                 pendingPaidUndo = nil
+                isSummaryCollapsed = false
             }
             .onChange(of: settings.locationCodes) {
                 if !settings.hasMultipleLocations {
@@ -163,6 +172,17 @@ struct DashboardView: View {
         }
         .background(Theme.background)
         .scrollIndicators(.hidden)
+        .onScrollGeometryChange(for: CGFloat.self) { geometry in
+            geometry.contentOffset.y
+        } action: { _, offset in
+            guard month == selectedMonth else { return }
+            let shouldCollapse = offset > summaryCardHeight + 8
+            if shouldCollapse != isSummaryCollapsed {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    isSummaryCollapsed = shouldCollapse
+                }
+            }
+        }
     }
 
     @ViewBuilder
@@ -172,6 +192,12 @@ struct DashboardView: View {
         VStack(spacing: 0) {
             MonthSummaryCard(plan: plan, monthName: monthTitle(for: month), isCurrentMonth: month == currentMonth)
                 .padding(.bottom, 16)
+                .onGeometryChange(for: CGFloat.self) { proxy in
+                    proxy.size.height
+                } action: { newValue in
+                    guard month == selectedMonth else { return }
+                    summaryCardHeight = newValue
+                }
 
             if settings.hasMultipleLocations {
                 LocationFilterPills(codes: settings.locationCodes, selection: $filter)
