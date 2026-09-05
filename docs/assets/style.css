@@ -1,0 +1,370 @@
+:root {
+  --bg: #f5f5f7;
+  --surface: #ffffff;
+  --text: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --accent: #0071e3;
+  --accent-hover: #0077ed;
+  --border: rgba(0, 0, 0, 0.08);
+  --shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  --radius-lg: 28px;
+  --radius-md: 18px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --text: #f5f5f7;
+    --text-secondary: #98989d;
+    --accent: #2997ff;
+    --accent-hover: #57a9ff;
+    --border: rgba(255, 255, 255, 0.1);
+    --shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+.wrap {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: saturate(180%) blur(20px);
+  background: color-mix(in srgb, var(--bg) 75%, transparent);
+  border-bottom: 1px solid var(--border);
+}
+
+nav .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.brand img {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: block;
+}
+
+.nav-links {
+  display: flex;
+  gap: 28px;
+}
+
+.nav-links a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.nav-links a:hover {
+  opacity: 1;
+}
+
+header.hero {
+  text-align: center;
+  padding: 88px 24px 48px;
+}
+
+.hero img.app-icon {
+  width: 120px;
+  height: 120px;
+  border-radius: 27px;
+  box-shadow: var(--shadow);
+  margin-bottom: 28px;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 12px;
+}
+
+.tagline {
+  font-size: clamp(1.05rem, 2.4vw, 1.4rem);
+  color: var(--text-secondary);
+  max-width: 640px;
+  margin: 0 auto 32px;
+  font-weight: 500;
+}
+
+.badges {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+}
+
+.badges img {
+  height: 22px;
+}
+
+.cta-row {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 26px;
+  border-radius: 980px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.screens {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 24px 24px 96px;
+}
+
+.screens img {
+  width: 220px;
+  border-radius: 32px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+section.features {
+  padding: 24px 0 96px;
+}
+
+.section-title {
+  text-align: center;
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 48px;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 760px) {
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+}
+
+.feature-card h3 {
+  font-size: 1.15rem;
+  margin: 0 0 10px;
+}
+
+.feature-card p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+section.privacy {
+  padding: 0 0 96px;
+}
+
+.privacy-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 44px;
+  text-align: center;
+}
+
+.privacy-card h2 {
+  margin-top: 0;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.privacy-card p {
+  color: var(--text-secondary);
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+footer {
+  border-top: 1px solid var(--border);
+  padding: 32px 24px 60px;
+}
+
+footer .wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+footer p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+footer .links {
+  display: flex;
+  gap: 20px;
+}
+
+footer a {
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+footer a:hover {
+  color: var(--text);
+}
+
+main.page {
+  padding: 72px 24px 96px;
+  min-height: 60vh;
+}
+
+main.page .wrap {
+  max-width: 640px;
+}
+
+main.page h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  text-align: center;
+}
+
+main.page .lead {
+  text-align: center;
+  color: var(--text-secondary);
+  margin-bottom: 48px;
+}
+
+.contact-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.contact-card .icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 22px;
+}
+
+.contact-card h2 {
+  margin: 0 0 6px;
+  font-size: 1.2rem;
+}
+
+.contact-card a.email {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.contact-card a.email:hover {
+  text-decoration: underline;
+}
+
+.faq {
+  margin-top: 40px;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--border);
+  padding: 22px 0;
+}
+
+.faq-item:last-child {
+  border-bottom: none;
+}
+
+.faq-item h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.faq-item p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
