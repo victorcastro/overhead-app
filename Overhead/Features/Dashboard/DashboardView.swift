@@ -59,15 +59,29 @@ struct DashboardView: View {
         selectedMonth.formatted(.dateTime.year())
     }
 
+    private var monthScrollPosition: Binding<Date?> {
+        Binding {
+            selectedMonth
+        } set: { newValue in
+            guard let newValue, newValue != selectedMonth else { return }
+            selectedMonth = newValue
+        }
+    }
+
     var body: some View {
         NavigationStack {
-            TabView(selection: $selectedMonth) {
-                ForEach(availableMonths, id: \.self) { month in
-                    monthPage(month)
-                        .tag(month)
+            ScrollView(.horizontal) {
+                LazyHStack(spacing: 0) {
+                    ForEach(availableMonths, id: \.self) { month in
+                        monthPage(month)
+                            .containerRelativeFrame(.horizontal)
+                    }
                 }
+                .scrollTargetLayout()
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
+            .scrollTargetBehavior(.paging)
+            .scrollPosition(id: monthScrollPosition)
+            .scrollIndicators(.hidden)
             .background(Theme.background)
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle(monthNameTitle)

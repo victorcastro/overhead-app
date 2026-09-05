@@ -38,15 +38,29 @@ struct CalendarView: View {
         return YearSummary(months: months)
     }
 
+    private var yearScrollPosition: Binding<Date?> {
+        Binding {
+            displayedYear
+        } set: { newValue in
+            guard let newValue, newValue != displayedYear else { return }
+            displayedYear = newValue
+        }
+    }
+
     var body: some View {
         NavigationStack {
-            TabView(selection: $displayedYear) {
-                ForEach(availableYears, id: \.self) { year in
-                    yearPage(year)
-                        .tag(year)
+            ScrollView(.horizontal) {
+                LazyHStack(spacing: 0) {
+                    ForEach(availableYears, id: \.self) { year in
+                        yearPage(year)
+                            .containerRelativeFrame(.horizontal)
+                    }
                 }
+                .scrollTargetLayout()
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
+            .scrollTargetBehavior(.paging)
+            .scrollPosition(id: yearScrollPosition)
+            .scrollIndicators(.hidden)
             .background(Theme.background)
             .navigationTitle(yearTitle)
             .navigationBarTitleDisplayMode(.inline)
