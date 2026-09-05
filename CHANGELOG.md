@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-09-05
+
+### Added
+
+- Monthly overview bar chart in the Calendar tab, one bar per month colored against the year's average, shown above
+  the month grid.
+- Floating undo badge on Home after marking an expense paid. It stays until the month changes or you tap it, and
+  tapping reverts that expense back to unpaid.
+- Compact summary bar on Home that appears once you scroll past the month summary card, keeping the amount left to
+  pay and its progress bar visible.
+- Project website under `docs/`, served via GitHub Pages: a landing page with the app icon, screenshots, and feature
+  overview, and a support page with a contact email.
+
+### Changed
+
+- Home and the Calendar tab now page between months and years with native horizontal scrolling instead of a paged
+  `TabView`, fixing swipes that were sometimes ignored or animated inconsistently.
+- The "This year" button in the Calendar tab is now an icon instead of text, to match the toolbar's other controls.
+
+### Fixed
+
+- The expense edit sheet now shows its drag indicator, so it reads as dismissible by dragging down.
+
 ## [1.3.1] - 2026-09-04
 
 ### Added
