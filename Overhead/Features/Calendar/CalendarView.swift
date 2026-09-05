@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import Charts
 
 struct CalendarView: View {
     let resetToken: Int
@@ -114,6 +115,8 @@ struct CalendarView: View {
                         .foregroundStyle(Theme.primaryText)
                 }
 
+                monthlyChart(summary)
+
                 LazyVGrid(columns: columns, spacing: 10) {
                     ForEach(summary.months) { month in
                         Button {
@@ -132,6 +135,42 @@ struct CalendarView: View {
         }
         .background(Theme.background)
         .scrollIndicators(.hidden)
+    }
+
+    private func monthlyChart(_ summary: YearSummary) -> some View {
+        Chart(summary.months) { month in
+            BarMark(
+                x: .value("Month", month.date, unit: .month),
+                y: .value("Total", (month.total as NSDecimalNumber).doubleValue)
+            )
+            .foregroundStyle(summary.statusColor(for: month.total))
+            .cornerRadius(3)
+        }
+        .chartXAxis {
+            AxisMarks(values: .stride(by: .month)) { _ in
+                AxisValueLabel(format: .dateTime.month(.narrow))
+                    .foregroundStyle(Theme.secondaryText)
+            }
+        }
+        .chartYAxis {
+            AxisMarks(position: .leading, values: .automatic(desiredCount: 3)) { value in
+                AxisGridLine()
+                    .foregroundStyle(Theme.separator)
+                if let amount = value.as(Double.self) {
+                    AxisValueLabel(compactAmount(amount))
+                        .foregroundStyle(Theme.secondaryText)
+                }
+            }
+        }
+        .frame(height: 70)
+    }
+
+    private func compactAmount(_ value: Double) -> String {
+        let symbol = base.format.symbol
+        if value >= 1000 {
+            return "\(symbol)\((value / 1000).formatted(.number.precision(.fractionLength(0...1))))K"
+        }
+        return "\(symbol)\(Int(value.rounded()))"
     }
 
     private func monthCard(_ month: AnnualMonthSummary, summary: YearSummary) -> some View {
