@@ -279,6 +279,7 @@ struct ExpenseFormView: View {
         }
         .preferredColorScheme(.dark)
         .tint(Theme.accent)
+        .presentationDragIndicator(showsCancelButton ? .visible : .automatic)
         .onAppear {
             guard !didAppear else { return }
             didAppear = true
