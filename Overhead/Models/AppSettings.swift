@@ -43,7 +43,11 @@ final class AppSettings {
 
     var decimalPlaces: Int {
         didSet {
-            decimalPlaces = Self.clampedDecimalPlaces(decimalPlaces)
+            let clamped = Self.clampedDecimalPlaces(decimalPlaces)
+            guard clamped == decimalPlaces else {
+                decimalPlaces = clamped
+                return
+            }
             guard decimalPlaces != oldValue else { return }
             defaults.set(decimalPlaces, forKey: Self.decimalPlacesKey)
             mirrorToCloud(decimalPlaces, forKey: Self.decimalPlacesKey)
@@ -60,7 +64,11 @@ final class AppSettings {
 
     var reminderDaysBefore: Int {
         didSet {
-            reminderDaysBefore = Self.clampedReminderDaysBefore(reminderDaysBefore)
+            let clamped = Self.clampedReminderDaysBefore(reminderDaysBefore)
+            guard clamped == reminderDaysBefore else {
+                reminderDaysBefore = clamped
+                return
+            }
             guard reminderDaysBefore != oldValue else { return }
             defaults.set(reminderDaysBefore, forKey: Self.reminderDaysBeforeKey)
             mirrorToCloud(reminderDaysBefore, forKey: Self.reminderDaysBeforeKey)

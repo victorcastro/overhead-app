@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- App crash when changing the reminder lead time in Settings, caused by the setting re-assigning itself endlessly.
 - Due-date reminders now say how many days remain when the notification arrives, not when it was scheduled.
 
 ## [1.4.0] - 2026-09-05

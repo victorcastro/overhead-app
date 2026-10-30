@@ -50,6 +50,32 @@ struct AppSettingsTests {
         #expect(again.locationCodes == ["PE"])
     }
 
+    @Test func reminderDaysBeforeAcceptsEveryOptionWithoutRecursing() {
+        let defaults = makeDefaults()
+        let settings = AppSettings(defaults: defaults, ubiquitous: FakeKeyValueStore())
+
+        for days in AppSettings.reminderDaysBeforeOptions {
+            settings.reminderDaysBefore = days
+            #expect(settings.reminderDaysBefore == days)
+            #expect(defaults.integer(forKey: AppSettings.reminderDaysBeforeKey) == days)
+        }
+    }
+
+    @Test func reminderDaysBeforeFallsBackToDefaultForUnknownValues() {
+        let settings = AppSettings(defaults: makeDefaults(), ubiquitous: FakeKeyValueStore())
+        settings.reminderDaysBefore = 7
+        settings.reminderDaysBefore = 5
+        #expect(settings.reminderDaysBefore == AppSettings.defaultReminderDaysBefore)
+    }
+
+    @Test func decimalPlacesAreClampedWithoutRecursing() {
+        let settings = AppSettings(defaults: makeDefaults(), ubiquitous: FakeKeyValueStore())
+        settings.decimalPlaces = 9
+        #expect(settings.decimalPlaces == AppSettings.decimalPlacesOptions.last)
+        settings.decimalPlaces = 3
+        #expect(settings.decimalPlaces == 3)
+    }
+
     @Test func syncIsOffByDefault() {
         let settings = AppSettings(defaults: makeDefaults(), ubiquitous: FakeKeyValueStore())
         #expect(!settings.iCloudSyncEnabled)
