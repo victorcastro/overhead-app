@@ -6,6 +6,7 @@ struct GeneralSettingsSection: View {
             ICloudSyncRow()
             CurrencyRow()
             LocationsRow()
+            DataFileRow()
         }
         .listRowBackground(Theme.card)
     }
@@ -69,6 +70,17 @@ struct GeneralSettingsSection: View {
                     Text(settings.locationCodes.isEmpty ? "None" : "\(settings.locationCodes.count)")
                         .foregroundStyle(Theme.secondaryText)
                 }
+            }
+        }
+    }
+
+    private struct DataFileRow: View {
+        var body: some View {
+            NavigationLink {
+                DataFileView()
+            } label: {
+                Text("Backup (export / import)")
+                    .foregroundStyle(Theme.primaryText)
             }
         }
     }
