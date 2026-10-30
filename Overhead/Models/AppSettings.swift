@@ -11,8 +11,8 @@ final class AppSettings {
     static let reminderDaysBeforeKey = "reminderDaysBefore"
     static let defaultDecimalPlaces = 2
     static let decimalPlacesOptions = Array(0...4)
-    static let defaultReminderDaysBefore = 1
-    static let reminderDaysBeforeOptions = [0, 1, 3, 7]
+    static let defaultReminderDaysBefore = [1]
+    static let reminderDaysBeforeOptions = [0, 1, 3, 5, 7]
     static let reminderHour = 9
 
     var baseCurrency: Currency {
@@ -62,11 +62,11 @@ final class AppSettings {
         }
     }
 
-    var reminderDaysBefore: Int {
+    var reminderDaysBefore: [Int] {
         didSet {
-            let clamped = Self.clampedReminderDaysBefore(reminderDaysBefore)
-            guard clamped == reminderDaysBefore else {
-                reminderDaysBefore = clamped
+            let normalized = Self.normalizedReminderDaysBefore(reminderDaysBefore)
+            guard normalized == reminderDaysBefore else {
+                reminderDaysBefore = normalized
                 return
             }
             guard reminderDaysBefore != oldValue else { return }
@@ -113,9 +113,11 @@ final class AppSettings {
         let storedReminders = defaults.object(forKey: Self.remindersEnabledKey) as? Bool
         remindersEnabled = cloudReminders ?? storedReminders ?? false
 
-        let cloudDaysBefore = syncEnabled ? ubiquitous.object(forKey: Self.reminderDaysBeforeKey) as? Int : nil
-        let storedDaysBefore = defaults.object(forKey: Self.reminderDaysBeforeKey) as? Int
-        reminderDaysBefore = Self.clampedReminderDaysBefore(
+        let cloudDaysBefore = syncEnabled
+            ? Self.reminderDaysBefore(from: ubiquitous.object(forKey: Self.reminderDaysBeforeKey))
+            : nil
+        let storedDaysBefore = Self.reminderDaysBefore(from: defaults.object(forKey: Self.reminderDaysBeforeKey))
+        reminderDaysBefore = Self.normalizedReminderDaysBefore(
             cloudDaysBefore ?? storedDaysBefore ?? Self.defaultReminderDaysBefore
         )
 
@@ -133,8 +135,15 @@ final class AppSettings {
         return min(max(value, first), last)
     }
 
-    static func clampedReminderDaysBefore(_ value: Int) -> Int {
-        reminderDaysBeforeOptions.contains(value) ? value : defaultReminderDaysBefore
+    static func normalizedReminderDaysBefore(_ values: [Int]) -> [Int] {
+        let valid = Set(values).intersection(reminderDaysBeforeOptions).sorted()
+        return valid.isEmpty ? defaultReminderDaysBefore : valid
+    }
+
+    private static func reminderDaysBefore(from object: Any?) -> [Int]? {
+        if let days = object as? [Int] { return days }
+        if let day = object as? Int { return [day] }
+        return nil
     }
 
     func clearCloudMirror() {
@@ -189,8 +198,8 @@ final class AppSettings {
             remindersEnabled = enabled
         }
 
-        if let daysBefore = ubiquitous.object(forKey: Self.reminderDaysBeforeKey) as? Int,
-           Self.clampedReminderDaysBefore(daysBefore) != reminderDaysBefore {
+        if let daysBefore = Self.reminderDaysBefore(from: ubiquitous.object(forKey: Self.reminderDaysBeforeKey)),
+           Self.normalizedReminderDaysBefore(daysBefore) != reminderDaysBefore {
             reminderDaysBefore = daysBefore
         }
     }

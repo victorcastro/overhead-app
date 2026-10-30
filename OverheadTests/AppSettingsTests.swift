@@ -50,22 +50,36 @@ struct AppSettingsTests {
         #expect(again.locationCodes == ["PE"])
     }
 
-    @Test func reminderDaysBeforeAcceptsEveryOptionWithoutRecursing() {
+    @Test func reminderDaysBeforeKeepsSeveralSelectedDaysSorted() {
         let defaults = makeDefaults()
         let settings = AppSettings(defaults: defaults, ubiquitous: FakeKeyValueStore())
 
-        for days in AppSettings.reminderDaysBeforeOptions {
-            settings.reminderDaysBefore = days
-            #expect(settings.reminderDaysBefore == days)
-            #expect(defaults.integer(forKey: AppSettings.reminderDaysBeforeKey) == days)
-        }
+        settings.reminderDaysBefore = [7, 0, 3]
+        #expect(settings.reminderDaysBefore == [0, 3, 7])
+        #expect(defaults.array(forKey: AppSettings.reminderDaysBeforeKey) as? [Int] == [0, 3, 7])
+
+        let reloaded = AppSettings(defaults: defaults, ubiquitous: FakeKeyValueStore())
+        #expect(reloaded.reminderDaysBefore == [0, 3, 7])
     }
 
-    @Test func reminderDaysBeforeFallsBackToDefaultForUnknownValues() {
+    @Test func reminderDaysBeforeDropsUnknownAndDuplicateValues() {
         let settings = AppSettings(defaults: makeDefaults(), ubiquitous: FakeKeyValueStore())
-        settings.reminderDaysBefore = 7
-        settings.reminderDaysBefore = 5
+        settings.reminderDaysBefore = [5, 4, 5, 9]
+        #expect(settings.reminderDaysBefore == [5])
+    }
+
+    @Test func reminderDaysBeforeFallsBackToDefaultWhenEmpty() {
+        let settings = AppSettings(defaults: makeDefaults(), ubiquitous: FakeKeyValueStore())
+        settings.reminderDaysBefore = [7]
+        settings.reminderDaysBefore = []
         #expect(settings.reminderDaysBefore == AppSettings.defaultReminderDaysBefore)
+    }
+
+    @Test func reminderDaysBeforeMigratesTheSingleValueFormat() {
+        let defaults = makeDefaults()
+        defaults.set(3, forKey: AppSettings.reminderDaysBeforeKey)
+        let settings = AppSettings(defaults: defaults, ubiquitous: FakeKeyValueStore())
+        #expect(settings.reminderDaysBefore == [3])
     }
 
     @Test func decimalPlacesAreClampedWithoutRecursing() {

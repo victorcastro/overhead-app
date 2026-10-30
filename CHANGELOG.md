@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Firebase Crashlytics crash reporting.
 
+### Changed
+
+- Reminder lead time is now a multiple choice: pick any of the due date itself, 1, 3, 5 or 7 days before. A previously saved
+  single choice carries over.
+
 ### Fixed
 
 - App crash when changing the reminder lead time in Settings, caused by the setting re-assigning itself endlessly.

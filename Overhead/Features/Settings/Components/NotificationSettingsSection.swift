@@ -18,12 +18,17 @@ struct NotificationSettingsSection: View {
                 .disabled(isRequesting)
 
             if settings.remindersEnabled {
-                Picker("Remind me", selection: $settings.reminderDaysBefore) {
-                    ForEach(AppSettings.reminderDaysBeforeOptions, id: \.self) { days in
-                        Text(label(for: days)).tag(days)
+                NavigationLink {
+                    ReminderDaysSelectionView()
+                } label: {
+                    HStack {
+                        Text("Remind me")
+                        Spacer()
+                        Text(summary)
+                            .foregroundStyle(Theme.secondaryText)
                     }
                 }
-                .pickerStyle(.navigationLink)
+                .foregroundStyle(Theme.primaryText)
             }
 
             if status == .denied {
@@ -50,16 +55,14 @@ struct NotificationSettingsSection: View {
         guard status != .denied else {
             return "Notifications are turned off for Overhead in the Settings app."
         }
-        return "Reminders arrive at \(AppSettings.reminderHour):00 on the chosen day. "
+        return "Reminders arrive at \(AppSettings.reminderHour):00 on each chosen day. "
             + "Expenses already marked as paid are skipped."
     }
 
-    private func label(for days: Int) -> String {
-        switch days {
-        case 0: "On the due date"
-        case 1: "1 day before"
-        default: "\(days) days before"
-        }
+    private var summary: String {
+        settings.reminderDaysBefore
+            .map { $0 == 0 ? "Due date" : "\($0)d" }
+            .joined(separator: ", ")
     }
 
     private func handle(_ enabled: Bool) async {

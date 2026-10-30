@@ -15,6 +15,7 @@ final class ExpenseReminderScheduler {
     private struct Occurrence {
         let expense: FixedExpense
         let dueDate: Date
+        let daysBefore: Int
         let trigger: DateComponents
         let fireDate: Date
     }
@@ -58,7 +59,7 @@ final class ExpenseReminderScheduler {
 
     private func occurrences(
         for expenses: [FixedExpense],
-        daysBefore: Int,
+        daysBefore: [Int],
         calendar: Calendar = .current
     ) -> [Occurrence] {
         expenses.flatMap { occurrences(for: $0, daysBefore: daysBefore, calendar: calendar) }
@@ -66,27 +67,26 @@ final class ExpenseReminderScheduler {
 
     private func occurrences(
         for expense: FixedExpense,
-        daysBefore: Int,
+        daysBefore: [Int],
         calendar: Calendar
     ) -> [Occurrence] {
         var found: [Occurrence] = []
+        var dueDatesVisited = 0
         var cursor = calendar.startOfDay(for: .now)
 
-        while found.count < Self.maxPerExpense {
+        while dueDatesVisited < Self.maxPerExpense {
             guard let dueDate = expense.nextDueDate(
                 onOrAfter: cursor,
                 calendar: calendar,
                 monthsAhead: Self.horizonMonths
             ) else { break }
 
-            if !expense.isPaid(in: dueDate),
-               let occurrence = occurrence(
-                   for: expense,
-                   dueDate: dueDate,
-                   daysBefore: daysBefore,
-                   calendar: calendar
-               ) {
-                found.append(occurrence)
+            dueDatesVisited += 1
+
+            if !expense.isPaid(in: dueDate) {
+                found += daysBefore.compactMap {
+                    occurrence(for: expense, dueDate: dueDate, daysBefore: $0, calendar: calendar)
+                }
             }
 
             guard let next = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: dueDate)) else {
@@ -116,7 +116,13 @@ final class ExpenseReminderScheduler {
 
         guard let fireDate = calendar.date(from: components), fireDate > .now else { return nil }
 
-        return Occurrence(expense: expense, dueDate: dueDate, trigger: components, fireDate: fireDate)
+        return Occurrence(
+            expense: expense,
+            dueDate: dueDate,
+            daysBefore: daysBefore,
+            trigger: components,
+            fireDate: fireDate
+        )
     }
 
     private func identifier(for occurrence: Occurrence) -> String {
@@ -125,6 +131,8 @@ final class ExpenseReminderScheduler {
             + String(abs(key.hashValue), radix: 36)
             + "."
             + ExpenseIdentity.dayKey(for: occurrence.dueDate)
+            + "."
+            + String(occurrence.daysBefore)
     }
 
     private func content(for occurrence: Occurrence, decimals: Int) -> UNMutableNotificationContent {
