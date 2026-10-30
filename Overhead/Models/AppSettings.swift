@@ -9,11 +9,13 @@ final class AppSettings {
     private static let iCloudSyncEnabledKey = "iCloudSyncEnabled"
     static let remindersEnabledKey = "remindersEnabled"
     static let reminderDaysBeforeKey = "reminderDaysBefore"
+    static let reminderMinutesKey = "reminderMinutes"
     static let defaultDecimalPlaces = 2
     static let decimalPlacesOptions = Array(0...4)
     static let defaultReminderDaysBefore = [1]
     static let reminderDaysBeforeOptions = [0, 1, 3, 5, 7]
-    static let reminderHour = 9
+    static let defaultReminderMinutes = 9 * 60
+    static let reminderMinutesRange = 0...(24 * 60 - 1)
 
     var baseCurrency: Currency {
         didSet {
@@ -38,6 +40,7 @@ final class AppSettings {
             mirrorToCloud(decimalPlaces, forKey: Self.decimalPlacesKey)
             mirrorToCloud(remindersEnabled, forKey: Self.remindersEnabledKey)
             mirrorToCloud(reminderDaysBefore, forKey: Self.reminderDaysBeforeKey)
+            mirrorToCloud(reminderMinutes, forKey: Self.reminderMinutesKey)
         }
     }
 
@@ -72,6 +75,19 @@ final class AppSettings {
             guard reminderDaysBefore != oldValue else { return }
             defaults.set(reminderDaysBefore, forKey: Self.reminderDaysBeforeKey)
             mirrorToCloud(reminderDaysBefore, forKey: Self.reminderDaysBeforeKey)
+        }
+    }
+
+    var reminderMinutes: Int {
+        didSet {
+            let clamped = Self.clampedReminderMinutes(reminderMinutes)
+            guard clamped == reminderMinutes else {
+                reminderMinutes = clamped
+                return
+            }
+            guard reminderMinutes != oldValue else { return }
+            defaults.set(reminderMinutes, forKey: Self.reminderMinutesKey)
+            mirrorToCloud(reminderMinutes, forKey: Self.reminderMinutesKey)
         }
     }
 
@@ -121,6 +137,12 @@ final class AppSettings {
             cloudDaysBefore ?? storedDaysBefore ?? Self.defaultReminderDaysBefore
         )
 
+        let cloudMinutes = syncEnabled ? ubiquitous.object(forKey: Self.reminderMinutesKey) as? Int : nil
+        let storedMinutes = defaults.object(forKey: Self.reminderMinutesKey) as? Int
+        reminderMinutes = Self.clampedReminderMinutes(
+            cloudMinutes ?? storedMinutes ?? Self.defaultReminderMinutes
+        )
+
         observeExternalChanges()
     }
 
@@ -133,6 +155,10 @@ final class AppSettings {
     static func clampedDecimalPlaces(_ value: Int) -> Int {
         guard let first = decimalPlacesOptions.first, let last = decimalPlacesOptions.last else { return value }
         return min(max(value, first), last)
+    }
+
+    static func clampedReminderMinutes(_ value: Int) -> Int {
+        min(max(value, reminderMinutesRange.lowerBound), reminderMinutesRange.upperBound)
     }
 
     static func normalizedReminderDaysBefore(_ values: [Int]) -> [Int] {
@@ -152,6 +178,7 @@ final class AppSettings {
         ubiquitous.removeObject(forKey: Self.decimalPlacesKey)
         ubiquitous.removeObject(forKey: Self.remindersEnabledKey)
         ubiquitous.removeObject(forKey: Self.reminderDaysBeforeKey)
+        ubiquitous.removeObject(forKey: Self.reminderMinutesKey)
         ubiquitous.synchronize()
     }
 
@@ -201,6 +228,11 @@ final class AppSettings {
         if let daysBefore = Self.reminderDaysBefore(from: ubiquitous.object(forKey: Self.reminderDaysBeforeKey)),
            Self.normalizedReminderDaysBefore(daysBefore) != reminderDaysBefore {
             reminderDaysBefore = daysBefore
+        }
+
+        if let minutes = ubiquitous.object(forKey: Self.reminderMinutesKey) as? Int,
+           Self.clampedReminderMinutes(minutes) != reminderMinutes {
+            reminderMinutes = minutes
         }
     }
 }

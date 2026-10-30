@@ -82,6 +82,24 @@ struct AppSettingsTests {
         #expect(settings.reminderDaysBefore == [3])
     }
 
+    @Test func reminderMinutesDefaultToNineAndPersist() {
+        let defaults = makeDefaults()
+        let settings = AppSettings(defaults: defaults, ubiquitous: FakeKeyValueStore())
+        #expect(settings.reminderMinutes == 9 * 60)
+
+        settings.reminderMinutes = 20 * 60 + 30
+        let reloaded = AppSettings(defaults: defaults, ubiquitous: FakeKeyValueStore())
+        #expect(reloaded.reminderMinutes == 20 * 60 + 30)
+    }
+
+    @Test func reminderMinutesAreClampedToTheDay() {
+        let settings = AppSettings(defaults: makeDefaults(), ubiquitous: FakeKeyValueStore())
+        settings.reminderMinutes = 5000
+        #expect(settings.reminderMinutes == 24 * 60 - 1)
+        settings.reminderMinutes = -10
+        #expect(settings.reminderMinutes == 0)
+    }
+
     @Test func decimalPlacesAreClampedWithoutRecursing() {
         let settings = AppSettings(defaults: makeDefaults(), ubiquitous: FakeKeyValueStore())
         settings.decimalPlaces = 9

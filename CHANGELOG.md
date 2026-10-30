@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Reminders fire at a time you choose in Settings instead of a fixed 9:00.
 - Reminder lead time is now a multiple choice: pick any of the due date itself, 1, 3, 5 or 7 days before. A previously saved
   single choice carries over.
 

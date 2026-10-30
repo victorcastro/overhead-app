@@ -30,6 +30,7 @@ struct ReminderSyncView: View {
 
         return ([
             String(settings.remindersEnabled),
+            String(settings.reminderMinutes),
             settings.reminderDaysBefore.map(String.init).joined(separator: ","),
             String(expenses.count)
         ] + expenseKeys).joined(separator: "\n")

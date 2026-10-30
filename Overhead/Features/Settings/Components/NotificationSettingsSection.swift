@@ -29,6 +29,9 @@ struct NotificationSettingsSection: View {
                     }
                 }
                 .foregroundStyle(Theme.primaryText)
+
+                DatePicker("Time", selection: reminderTime, displayedComponents: .hourAndMinute)
+                    .foregroundStyle(Theme.primaryText)
             }
 
             if status == .denied {
@@ -55,8 +58,26 @@ struct NotificationSettingsSection: View {
         guard status != .denied else {
             return "Notifications are turned off for Overhead in the Settings app."
         }
-        return "Reminders arrive at \(AppSettings.reminderHour):00 on each chosen day. "
+        return "Reminders arrive at the chosen time on each chosen day. "
             + "Expenses already marked as paid are skipped."
+    }
+
+    private var reminderTime: Binding<Date> {
+        Binding(
+            get: {
+                let minutes = settings.reminderMinutes
+                return Calendar.current.date(
+                    bySettingHour: minutes / 60,
+                    minute: minutes % 60,
+                    second: 0,
+                    of: .now
+                ) ?? .now
+            },
+            set: { date in
+                let parts = Calendar.current.dateComponents([.hour, .minute], from: date)
+                settings.reminderMinutes = (parts.hour ?? 0) * 60 + (parts.minute ?? 0)
+            }
+        )
     }
 
     private var summary: String {

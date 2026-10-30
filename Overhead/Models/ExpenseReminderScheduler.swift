@@ -43,7 +43,11 @@ final class ExpenseReminderScheduler {
         let status = await authorizationStatus()
         guard status == .authorized || status == .provisional else { return }
 
-        let occurrences = occurrences(for: expenses, daysBefore: settings.reminderDaysBefore)
+        let occurrences = occurrences(
+            for: expenses,
+            daysBefore: settings.reminderDaysBefore,
+            minutes: settings.reminderMinutes
+        )
             .sorted { $0.fireDate < $1.fireDate }
             .prefix(Self.maxRequests)
 
@@ -60,14 +64,16 @@ final class ExpenseReminderScheduler {
     private func occurrences(
         for expenses: [FixedExpense],
         daysBefore: [Int],
+        minutes: Int,
         calendar: Calendar = .current
     ) -> [Occurrence] {
-        expenses.flatMap { occurrences(for: $0, daysBefore: daysBefore, calendar: calendar) }
+        expenses.flatMap { occurrences(for: $0, daysBefore: daysBefore, minutes: minutes, calendar: calendar) }
     }
 
     private func occurrences(
         for expense: FixedExpense,
         daysBefore: [Int],
+        minutes: Int,
         calendar: Calendar
     ) -> [Occurrence] {
         var found: [Occurrence] = []
@@ -85,7 +91,7 @@ final class ExpenseReminderScheduler {
 
             if !expense.isPaid(in: dueDate) {
                 found += daysBefore.compactMap {
-                    occurrence(for: expense, dueDate: dueDate, daysBefore: $0, calendar: calendar)
+                    occurrence(for: expense, dueDate: dueDate, daysBefore: $0, minutes: minutes, calendar: calendar)
                 }
             }
 
@@ -102,6 +108,7 @@ final class ExpenseReminderScheduler {
         for expense: FixedExpense,
         dueDate: Date,
         daysBefore: Int,
+        minutes: Int,
         calendar: Calendar
     ) -> Occurrence? {
         guard let day = calendar.date(
@@ -111,8 +118,8 @@ final class ExpenseReminderScheduler {
         ) else { return nil }
 
         var components = calendar.dateComponents([.year, .month, .day], from: day)
-        components.hour = AppSettings.reminderHour
-        components.minute = 0
+        components.hour = minutes / 60
+        components.minute = minutes % 60
 
         guard let fireDate = calendar.date(from: components), fireDate > .now else { return nil }
 
