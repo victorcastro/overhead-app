@@ -22,6 +22,7 @@ struct DashboardView: View {
     let resetToken: Int
 
     @Environment(\.moneyFormat) private var money
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(AppSettings.self) private var settings
     @Query(sort: \FixedExpense.anchorDueDate) private var expenses: [FixedExpense]
 
@@ -36,6 +37,10 @@ struct DashboardView: View {
 
     private let currentMonth = MonthWindow.currentMonth()
     private let availableMonths = MonthWindow.months()
+
+    private var isWide: Bool {
+        horizontalSizeClass == .regular
+    }
 
     private var activeFilter: LocationFilter {
         guard settings.hasMultipleLocations else { return .all }
@@ -90,6 +95,7 @@ struct DashboardView: View {
             .scrollTargetBehavior(.paging)
             .scrollPosition(id: monthScrollPosition)
             .scrollIndicators(.hidden)
+            .edgeToEdgePager()
             .background(Theme.background)
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle(monthNameTitle)
@@ -138,7 +144,7 @@ struct DashboardView: View {
                 }
             }
             .overlay(alignment: .top) {
-                if isSummaryCollapsed {
+                if isSummaryCollapsed && !isWide {
                     CompactMonthSummaryBar(plan: plan(for: selectedMonth))
                         .transition(.move(edge: .top).combined(with: .opacity))
                 }
@@ -164,11 +170,45 @@ struct DashboardView: View {
         }
     }
 
+    @ViewBuilder
     private func monthPage(_ month: Date) -> some View {
-        ScrollView {
-            monthSections(month)
-                .padding(.horizontal, Theme.horizontalPadding)
-                .padding(.top, 8)
+        if isWide {
+            wideMonthPage(month)
+        } else {
+            narrowMonthPage(month)
+        }
+    }
+
+    private func wideMonthPage(_ month: Date) -> some View {
+        let plan = plan(for: month)
+
+        return HStack(alignment: .top, spacing: 16) {
+            VStack(spacing: 0) {
+                summaryBlock(plan, month: month)
+            }
+            .frame(maxWidth: 360)
+            .padding(.top, 8)
+
+            ScrollView {
+                expenseSections(plan, month: month)
+                    .padding(.top, 8)
+            }
+            .scrollIndicators(.hidden)
+        }
+        .pagerContentPadding()
+        .background(Theme.background)
+    }
+
+    private func narrowMonthPage(_ month: Date) -> some View {
+        let plan = plan(for: month)
+
+        return ScrollView {
+            VStack(spacing: 0) {
+                summaryBlock(plan, month: month)
+                expenseSections(plan, month: month)
+            }
+            .pagerContentPadding()
+            .padding(.top, 8)
         }
         .background(Theme.background)
         .scrollIndicators(.hidden)
@@ -186,24 +226,25 @@ struct DashboardView: View {
     }
 
     @ViewBuilder
-    private func monthSections(_ month: Date) -> some View {
-        let plan = plan(for: month)
-
-        VStack(spacing: 0) {
-            MonthSummaryCard(plan: plan, monthName: monthTitle(for: month), isCurrentMonth: month == currentMonth)
-                .padding(.bottom, 16)
-                .onGeometryChange(for: CGFloat.self) { proxy in
-                    proxy.size.height
-                } action: { newValue in
-                    guard month == selectedMonth else { return }
-                    summaryCardHeight = newValue
-                }
-
-            if settings.hasMultipleLocations {
-                LocationFilterPills(codes: settings.locationCodes, selection: $filter)
-                    .padding(.bottom, 16)
+    private func summaryBlock(_ plan: MonthPlan, month: Date) -> some View {
+        MonthSummaryCard(plan: plan, monthName: monthTitle(for: month), isCurrentMonth: month == currentMonth)
+            .padding(.bottom, 16)
+            .onGeometryChange(for: CGFloat.self) { proxy in
+                proxy.size.height
+            } action: { newValue in
+                guard month == selectedMonth else { return }
+                summaryCardHeight = newValue
             }
 
+        if settings.hasMultipleLocations {
+            LocationFilterPills(codes: settings.locationCodes, selection: $filter)
+                .padding(.bottom, 16)
+        }
+    }
+
+    @ViewBuilder
+    private func expenseSections(_ plan: MonthPlan, month: Date) -> some View {
+        VStack(spacing: 0) {
             ForEach(plan.unpaidByCategory) { group in
                 SectionHeader(
                     title: "\(group.category.label) · \(money(group.total, plan.base))",

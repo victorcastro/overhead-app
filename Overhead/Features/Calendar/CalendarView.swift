@@ -6,6 +6,7 @@ struct CalendarView: View {
     let resetToken: Int
 
     @Environment(\.moneyFormat) private var money
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(AppSettings.self) private var settings
     @Query(sort: \FixedExpense.anchorDueDate) private var expenses: [FixedExpense]
 
@@ -14,7 +15,11 @@ struct CalendarView: View {
 
     private let currentYear = MonthWindow.yearStart(for: .now)
     private let calendar = Calendar.current
-    private let columns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
+
+    private var columns: [GridItem] {
+        let count = horizontalSizeClass == .regular ? 6 : 3
+        return Array(repeating: GridItem(.flexible(), spacing: 10), count: count)
+    }
 
     private var base: Currency { settings.baseCurrency }
 
@@ -62,6 +67,7 @@ struct CalendarView: View {
             .scrollTargetBehavior(.paging)
             .scrollPosition(id: yearScrollPosition)
             .scrollIndicators(.hidden)
+            .edgeToEdgePager()
             .background(Theme.background)
             .navigationTitle(yearTitle)
             .navigationBarTitleDisplayMode(.inline)
@@ -130,7 +136,7 @@ struct CalendarView: View {
 
                 calendarLegend
             }
-            .padding(.horizontal, Theme.horizontalPadding)
+            .pagerContentPadding()
             .padding(.vertical, 12)
         }
         .background(Theme.background)
