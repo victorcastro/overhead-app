@@ -130,17 +130,17 @@ final class ExpenseReminderScheduler {
     private func content(for occurrence: Occurrence, decimals: Int) -> UNMutableNotificationContent {
         let content = UNMutableNotificationContent()
         content.title = occurrence.expense.name
-        content.body = timing(for: occurrence.dueDate)
+        content.body = timing(from: occurrence.fireDate, to: occurrence.dueDate)
             + " · "
             + Money.string(occurrence.expense.amount, currency: occurrence.expense.currency, decimals: decimals)
         content.sound = .default
         return content
     }
 
-    private func timing(for dueDate: Date, calendar: Calendar = .current) -> String {
+    private func timing(from fireDate: Date, to dueDate: Date, calendar: Calendar = .current) -> String {
         let days = calendar.dateComponents(
             [.day],
-            from: calendar.startOfDay(for: .now),
+            from: calendar.startOfDay(for: fireDate),
             to: calendar.startOfDay(for: dueDate)
         ).day ?? 0
 
