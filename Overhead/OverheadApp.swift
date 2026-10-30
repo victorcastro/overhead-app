@@ -3,6 +3,7 @@ import SwiftData
 
 @main
 struct OverheadApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var settings: AppSettings
     @State private var container: ModelContainer
 

@@ -6,6 +6,13 @@
 	objectVersion = 100;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		CCA3B7BD3095380E001142F9 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = CCA3B7BC3095380E001142F9 /* FirebaseAnalytics */; };
+		CCA3B7BF3095380E001142F9 /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = CCA3B7BE3095380E001142F9 /* FirebaseAppCheck */; };
+		CCA3B7C13095380E001142F9 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = CCA3B7C03095380E001142F9 /* FirebaseCore */; };
+		CCA3B7C33095380E001142F9 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = CCA3B7C23095380E001142F9 /* FirebaseCrashlytics */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		CC3990F5304862E000420738 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -53,6 +60,10 @@
 		CC3990E2304862DF00420738 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				CCA3B7BF3095380E001142F9 /* FirebaseAppCheck in Frameworks */,
+				CCA3B7C33095380E001142F9 /* FirebaseCrashlytics in Frameworks */,
+				CCA3B7C13095380E001142F9 /* FirebaseCore in Frameworks */,
+				CCA3B7BD3095380E001142F9 /* FirebaseAnalytics in Frameworks */,
 			);
 		};
 		CC3990F1304862E000420738 /* Frameworks */ = {
@@ -101,6 +112,7 @@
 				CC3990E1304862DF00420738 /* Sources */,
 				CC3990E2304862DF00420738 /* Frameworks */,
 				CC3990E3304862DF00420738 /* Resources */,
+				A1000002304862DF00420738 /* Crashlytics */,
 			);
 			buildRules = (
 			);
@@ -108,6 +120,12 @@
 				CC3990E7304862DF00420738 /* Overhead */,
 			);
 			name = Overhead;
+			packageProductDependencies = (
+				CCA3B7BC3095380E001142F9 /* FirebaseAnalytics */,
+				CCA3B7BE3095380E001142F9 /* FirebaseAppCheck */,
+				CCA3B7C03095380E001142F9 /* FirebaseCore */,
+				CCA3B7C23095380E001142F9 /* FirebaseCrashlytics */,
+			);
 			productName = Overhead;
 			productReference = CC3990E5304862DF00420738 /* Overhead.app */;
 			productType = "com.apple.product-type.application";
@@ -186,6 +204,9 @@
 			);
 			mainGroup = CC3990DC304862DF00420738;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				CCA3B7BB3095380E001142F9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 100;
 			productRefGroup = CC3990E6304862DF00420738 /* Products */;
 			projectDirPath = "";
@@ -230,6 +251,24 @@
 				"    echo \"error: SwiftLint is not installed. Run: brew install swiftlint\"",
 				"    exit 1",
 				"fi",
+				"",
+			);
+		};
+		A1000002304862DF00420738 /* Crashlytics */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = Crashlytics;
+			shellPath = /bin/sh;
+			shellScript = (
+				"if [ ! -f \"${PROJECT_DIR}/Overhead/GoogleService-Info.plist\" ]; then",
+				"    echo \"note: GoogleService-Info.plist not found, skipping Crashlytics dSYM upload\"",
+				"    exit 0",
+				"fi",
+				"\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"",
 				"",
 			);
 		};
@@ -409,16 +448,18 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.4.0;
+				MARKETING_VERSION = 1.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.victorcastro.Overhead;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -444,16 +485,18 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.4.0;
+				MARKETING_VERSION = 1.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.victorcastro.Overhead;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -466,7 +509,7 @@
 				DEVELOPMENT_TEAM = 4G9UQ8D789;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.4.0;
+				MARKETING_VERSION = 1.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.victorcastro.OverheadTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
@@ -488,7 +531,7 @@
 				DEVELOPMENT_TEAM = 4G9UQ8D789;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.4.0;
+				MARKETING_VERSION = 1.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.victorcastro.OverheadTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
@@ -509,7 +552,7 @@
 				DEVELOPMENT_TEAM = 4G9UQ8D789;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.4.0;
+				MARKETING_VERSION = 1.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.victorcastro.OverheadUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
@@ -530,7 +573,7 @@
 				DEVELOPMENT_TEAM = 4G9UQ8D789;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.4.0;
+				MARKETING_VERSION = 1.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.victorcastro.OverheadUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
@@ -579,6 +622,40 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		CCA3B7BB3095380E001142F9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.1.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CCA3B7BC3095380E001142F9 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CCA3B7BB3095380E001142F9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		CCA3B7BE3095380E001142F9 /* FirebaseAppCheck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CCA3B7BB3095380E001142F9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAppCheck;
+		};
+		CCA3B7C03095380E001142F9 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CCA3B7BB3095380E001142F9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		CCA3B7C23095380E001142F9 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CCA3B7BB3095380E001142F9 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CC3990DD304862DF00420738 /* Project object */;
 }

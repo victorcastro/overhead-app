@@ -42,6 +42,7 @@ openspec/
 !.env.example
 *.mobileprovision
 *.p12
+GoogleService-Info.plist
 
 # Logs and test artifacts
 *.log
